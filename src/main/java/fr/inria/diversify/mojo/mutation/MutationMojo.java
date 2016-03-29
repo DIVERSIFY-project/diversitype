@@ -1,5 +1,6 @@
 package fr.inria.diversify.mojo.mutation;
 
+import fr.inria.diversify.utils.UtilsProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -22,7 +23,15 @@ public class MutationMojo extends AbstractMojo{
 
     /**
      * @parameter
-     *  expression="${search.project}"
+     * expression=${mutation.nchange}}
+     * defaut-value=1
+     * @throws MojoExecutionException
+     */
+    private int nChange;
+
+    /**
+     * @parameter
+     *  expression="${mutation.project}"
      *  default-value="/home/guerin/Documents/INRIA/ExProj/ProjA/"
      *  @throws MojoExecutionException
      */
@@ -30,7 +39,7 @@ public class MutationMojo extends AbstractMojo{
 
     /**
      *@parameter
-     *  expression="${search.interfaces}"
+     *  expression="${mutation.interfaces}"
      *  default-value="java.util.List"
      * @throws MojoExecutionException
      */
@@ -41,6 +50,8 @@ public class MutationMojo extends AbstractMojo{
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         getLog().info("MutationMojo launch");
+        getLog().info("constructorCall: "+ UtilsProcessorImpl.getSelectedCandidates(1));
+
 
     }
 }

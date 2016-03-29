@@ -77,7 +77,9 @@ public class StatisticsListProcessor extends spoon.processing.AbstractProcessor<
         for(int i=0;i<ctConstructorCalls.size();i++){
             if((!allreadyTreat.contains(ctConstructorCalls.get(i).getPosition().toString())) && isCandidate(ctConstructorCalls.get(i))){
                 LogWriter.addCandidateList(ctClass.getSimpleName(),staticType, ctConstructorCalls.get(i).getType().getActualClass().getSimpleName());
+                UtilsProcessorImpl.addCandidate(ctConstructorCalls.get(i));
                 allreadyTreat.add(ctConstructorCalls.get(i).getPosition().toString());
+
             }
         }
     }

@@ -12,7 +12,9 @@ import spoon.reflect.reference.CtTypeReference;
 import spoon.support.reflect.code.CtInvocationImpl;
 import spoon.support.reflect.code.CtLocalVariableImpl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -22,6 +24,33 @@ import java.util.List;
  * Created by guerin on 29/03/16.
  */
 public class UtilsProcessorImpl {
+
+    /**
+     * possible ConstructorCall for the mutation
+     */
+    private static List<CtConstructorCall> candidates=new ArrayList<>();
+    private static List<CtConstructorCall> selected=new ArrayList<>();
+
+
+    public static void addCandidate(CtConstructorCall ctConstructorCall){
+        candidates.add(ctConstructorCall);
+    }
+
+    public static List<CtConstructorCall> getSelectedCandidates(int n){
+
+        if(n>=candidates.size()){
+            return candidates;
+        }
+        Random r = new Random();
+
+        for(int i=0;i<n;i++){
+            int valeur =r.nextInt(candidates.size());
+            selected.add(candidates.get(valeur));
+        }
+
+        return selected;
+    }
+
 
     public static Class getStaticType(CtConstructorCall candidate){
 
