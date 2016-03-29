@@ -49,8 +49,8 @@ public class MutationMojo extends AbstractMojo{
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        getLog().info("MutationMojo launch");
-        getLog().info("constructorCall: "+ UtilsProcessorImpl.getSelectedCandidates(1));
+        getLog().info("MutationMojo launch "+nChange);
+        getLog().info("constructorCall: "+ UtilsProcessorImpl.getSelectedCandidates(nChange));
 
 
     }
