@@ -31,6 +31,8 @@ public class UtilsProcessorImpl {
     private static List<CtConstructorCall> candidates=new ArrayList<>();
     private static List<CtConstructorCall> selected=new ArrayList<>();
 
+    private static String project="";
+
 
     public static void addCandidate(CtConstructorCall ctConstructorCall){
         candidates.add(ctConstructorCall);
@@ -91,5 +93,11 @@ public class UtilsProcessorImpl {
         return null;
     }
 
+    public static String getProject() {
+        return project;
+    }
 
+    public static void setProject(String project) {
+        UtilsProcessorImpl.project = project;
+    }
 }

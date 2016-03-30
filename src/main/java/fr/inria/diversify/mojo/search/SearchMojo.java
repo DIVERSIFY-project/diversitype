@@ -4,6 +4,7 @@ package fr.inria.diversify.mojo.search;
 
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.processor.StatisticsListProcessor;
+import fr.inria.diversify.utils.UtilsProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import spoon.Launcher;
@@ -58,6 +59,8 @@ public class SearchMojo extends AbstractMojo {
     }
 
     public void spoonLauncher(){
+
+        UtilsProcessorImpl.setProject(projectDirectory);
 
         final SpoonAPI spoon = new Launcher();
         spoon.addInputResource(projectDirectory + "/src/main/java/");

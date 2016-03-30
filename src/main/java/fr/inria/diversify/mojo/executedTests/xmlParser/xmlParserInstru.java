@@ -6,4 +6,7 @@ package fr.inria.diversify.mojo.executedTests.xmlParser;
 public class xmlParserInstru {
 
 
+    public static void start(String testResultDirectory) {
+
+    }
 }
