@@ -17,6 +17,8 @@ import javax.swing.*;
  *
  * @requiresProject True
  *
+ * @execute  lifecycle="analysetest" phase="test"
+ *
  * Created by guerin on 04/02/16.
  */
 public class MutationMojo extends AbstractMojo{
@@ -49,7 +51,7 @@ public class MutationMojo extends AbstractMojo{
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        getLog().info("MutationMojo launch "+nChange);
+        getLog().info(" ** MutationMojo launch "+nChange);
         getLog().info("constructorCall: "+ UtilsProcessorImpl.getSelectedCandidates(nChange));
 
 

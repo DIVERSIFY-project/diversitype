@@ -39,6 +39,13 @@
 
 
   <build>
+    <resources>
+      <resource>
+        <directory>META-INF</directory>
+        <targetPath>META-INF</targetPath>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>fr.inria.diversify</groupId>

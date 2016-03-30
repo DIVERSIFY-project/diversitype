@@ -52,7 +52,7 @@ public class SearchMojo extends AbstractMojo {
     public void execute()
         throws MojoExecutionException
     {
-        getLog().info("Execute with: "+projectDirectory);
+        getLog().info(" * Search mojo - Execute with: "+projectDirectory);
         spoonLauncher();
 
     }

@@ -1,4 +1,4 @@
-package fr.inria.diversify.mojo.mutation.xmlParser;
+package fr.inria.diversify.mojo.executedTests.xmlParser;
 
 /**
  * Created by guerin on 04/02/16.

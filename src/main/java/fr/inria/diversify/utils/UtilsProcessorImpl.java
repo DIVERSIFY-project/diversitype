@@ -18,8 +18,8 @@ import java.util.Random;
 
 /**
  *
- *Class which contains methods for treat specific node
- *
+ *Class which contains methods for treat specific node in the source code
+ *(Exclude test suite)
  *
  * Created by guerin on 29/03/16.
  */

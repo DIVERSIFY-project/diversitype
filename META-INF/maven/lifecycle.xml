@@ -1,0 +1,18 @@
+<lifecycles>
+    <lifecycle>
+        <id>analysetest</id>
+        <phases>
+            <phase>
+                <id>test</id>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>analysetests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </phase>
+        </phases>
+    </lifecycle>
+</lifecycles>
+
