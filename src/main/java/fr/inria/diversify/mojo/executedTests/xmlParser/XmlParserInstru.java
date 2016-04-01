@@ -32,7 +32,9 @@ public class XmlParserInstru {
             List<File> children = Arrays.asList(parent.listFiles(filter));
             if (children.size() > 0) {
                 for(int i=0;i<children.size();i++){
-                    XmlFileParser.treat(children.get(i));
+                    if(children.get(i).length()!=0) {
+                        XmlFileParser.treat(children.get(i));
+                    }
                 }
             }
             List<File> files = Arrays.asList(parent.listFiles());
@@ -56,7 +58,6 @@ public class XmlParserInstru {
             if (p == null) {
                 throw new IllegalArgumentException("Pattern is missing");
             }
-
             this.pattern = p;
         }
 

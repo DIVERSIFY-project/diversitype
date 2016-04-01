@@ -1,11 +1,16 @@
 package fr.inria.diversify.mojo.executedTests.xmlParser;
 
 
+import fr.inria.diversify.utils.UtilsTestProcessorImpl;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.LocatorImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.util.jar.Attributes;
 
@@ -16,87 +21,117 @@ import java.util.jar.Attributes;
 public class XmlFileParser {
 
     public static void treat(File file) {
+        XMLReader reader;
+        TestFileHandler handler = new TestFileHandler();
         try{
-            //TODO
-
-            /*XMLReader reader = new org.apache.xerces.parsers.SAXParser();
-            TestFileHandler handler = new TestFileHandler();
+            reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             reader.setContentHandler(handler);
-            reader.parse(file.getAbsolutePath());*/
-        }catch(Exception e){
-            System.out.println(e);
+            reader.parse(file.getAbsolutePath());
+
+        }catch(Exception e) {
+            try {
+                // If unable to create an instance
+                // use the XMLReader from JAXP
+                SAXParserFactory m_parserFactory = SAXParserFactory.newInstance();
+                m_parserFactory.setNamespaceAware(true);
+                reader = m_parserFactory.newSAXParser().getXMLReader();
+                reader.setContentHandler(handler);
+                reader.parse(file.getAbsolutePath());
+            }catch (Exception e2){
+                System.out.println("exception: " + e2);
+            }
         }
+
+
     }
 
 
-    private static class TestFileHandler extends DefaultHandler{
+    private static class TestFileHandler implements ContentHandler {
+        private Locator locator;
         private String tagCourant;
 
         private String testCaseCurrent;
         private String testSuiteCurrent;
+        private String data;
+        private String failure;
 
-        /**
-         * Action on new xml element
-         * @param nameSpace
-         * @param localName
-         * @param qName
-         * @param attr
-         * @throws SAXException
-         */
-        public void startElement(String nameSpace, String localName, String qName, Attributes attr) throws SAXException {
-            switch (localName){
-                case "testsuite": break;
-                case "testcase": break;
-                case "failure": break;
+        public TestFileHandler(){
+            super();
+            this.locator=new LocatorImpl();
+        }
+
+        @Override
+        public void setDocumentLocator(Locator locator) {
+            this.locator=locator;
+        }
+
+        @Override
+        public void startDocument() throws SAXException {
+            tagCourant=null;
+            testCaseCurrent=null;
+            testSuiteCurrent=null;
+            data="";
+        }
+
+        @Override
+        public void endDocument() throws SAXException {
+
+        }
+
+        @Override
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {
+
+        }
+
+        @Override
+        public void endPrefixMapping(String prefix) throws SAXException {
+
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String qName, org.xml.sax.Attributes atts) throws SAXException {
+            switch(localName){
+                case "testsuite": testSuiteCurrent=findSpecificAtt(atts, "name");break;
+                case "testcase": testCaseCurrent=findSpecificAtt(atts,"classname"); break;
+                case "failure": failure=findSpecificAtt(atts,"type");data="";break;
             }
-
-            tagCourant = localName;
-            System.out.println("debut tag : " + localName);
         }
 
-        /**
-         * action at the xml element's ending
-         * @param nameSpace
-         * @param localName
-         * @param qName
-         * @throws SAXException
-         */
-        public void endElement(String nameSpace, String localName,String qName) throws SAXException {
-            tagCourant = "";
-            System.out.println("Fin tag " + localName);
-        }
-
-        /**
-         *
-         * Action for document's beginning
-         *
-         */
-        public void startDocument() {
-            //nothing to do
-        }
-
-        /**
-        * Action for document's ending
-        */
-        public void endDocument() {
-
-        }
-
-        /**
-         * Action on datas
-         * @param caracteres
-         * @param debut
-         * @param longueur
-         * @throws SAXException
-         */
-        public void characters(char[] caracteres, int debut,int longueur) throws SAXException {
-            String donnees = new String(caracteres, debut, longueur);
-
-            if (!tagCourant.equals("")) {
-                if(!Character.isISOControl(caracteres[debut])) {
-                    System.out.println("   Element " + tagCourant +", valeur = *" + donnees + "*");
+        private String findSpecificAtt(org.xml.sax.Attributes atts, String name) {
+            for (int index = 0; index < atts.getLength(); index++) {
+                if (atts.getLocalName(index).equals(name)){
+                    return  atts.getValue(index);
                 }
             }
+            return null;
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+            if(localName.equals("failure")){
+                UtilsTestProcessorImpl.addTestFail(testSuiteCurrent,testCaseCurrent,failure,data);
+            }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            data=data+(new String(ch, start, length));
+
+        }
+
+        @Override
+        public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+
+        }
+
+        @Override
+        public void processingInstruction(String target, String data) throws SAXException {
+
+        }
+
+        @Override
+        public void skippedEntity(String name) throws SAXException {
+
         }
     }
 

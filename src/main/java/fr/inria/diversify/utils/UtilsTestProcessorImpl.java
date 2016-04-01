@@ -9,5 +9,7 @@ package fr.inria.diversify.utils;
 public class UtilsTestProcessorImpl {
 
 
-
+    public static void addTestFail(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
+        System.out.println(testSuiteCurrent+" testCase: "+testCaseCurrent+" failure: "+failure+" data: "+data);
+    }
 }
