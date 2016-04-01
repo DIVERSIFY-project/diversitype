@@ -3,6 +3,7 @@ package fr.inria.diversify.mojo.executedTests;
 import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -24,7 +25,7 @@ public class ExecutedTestsMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         initializeMojo();
-        getLog().info(" *** ExecutesTestMojo: "+projectDirectory + " "+testResultDirectory);
+        getLog().info(" *** ExecutesTestMojo: " + projectDirectory + " " + testResultDirectory);
 
         //analyser chaque fichier TEST-project.classTest.xml
         XmlParserInstru.start(testResultDirectory);

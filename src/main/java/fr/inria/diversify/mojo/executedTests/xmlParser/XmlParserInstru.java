@@ -1,5 +1,7 @@
 package fr.inria.diversify.mojo.executedTests.xmlParser;
 
+import fr.inria.diversify.utils.UtilsTestProcessorImpl;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
@@ -12,21 +14,16 @@ import java.util.regex.Pattern;
  */
 public class XmlParserInstru {
 
-    public static void main(String[] args){
-        start("/home/guerin/Documents/INRIA/ExProj/ProjA/target/surefire-reports/");
-
-    }
-
     public static void start(String testResultDirectory) {
         File root=new File(testResultDirectory);
         Pattern name= Pattern.compile("(TEST-)(.)*(xml)");
-
-        findByFilter(root,name);
+        UtilsTestProcessorImpl.clean();
+        findByFilter(root, name);
 
     }
 
     public static void findByFilter(File parent, Pattern filename) {
-        String path = null;
+
         if (parent.isDirectory()) {
             TestFileFilter filter = new TestFileFilter(filename);
             List<File> children = Arrays.asList(parent.listFiles(filter));

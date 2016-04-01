@@ -100,4 +100,9 @@ public class UtilsProcessorImpl {
     public static void setProject(String project) {
         UtilsProcessorImpl.project = project;
     }
+
+    public static void printFailTest() {
+        //TODO
+
+    }
 }

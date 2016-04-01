@@ -1,11 +1,13 @@
 package fr.inria.diversify.mojo.mutation;
 
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import javax.swing.*;
+import java.util.List;
 
 /**
  * /**
@@ -47,13 +49,25 @@ public class MutationMojo extends AbstractMojo{
      */
     private String interfaces;
 
+    /**
+     * this attribute contains failed test before mutation
+     */
+    private List<String> testFailMainProject;
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         getLog().info(" ** MutationMojo launch "+nChange);
         getLog().info("constructorCall: "+ UtilsProcessorImpl.getSelectedCandidates(nChange));
+        getLog().info("I know this: "+ UtilsTestProcessorImpl.getTestSuiteFail());
 
+        testFailMainProject=UtilsTestProcessorImpl.getTestSuiteFail();
 
+        doMutation();
+    }
+
+    private void doMutation() {
+        //TODO
     }
 }
