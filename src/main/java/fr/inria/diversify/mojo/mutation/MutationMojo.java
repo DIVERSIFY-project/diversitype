@@ -1,12 +1,17 @@
 package fr.inria.diversify.mojo.mutation;
 
+import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
+import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
+import fr.inria.diversify.mojo.mutation.strategy.Strategy;
+import fr.inria.diversify.mojo.mutation.transformation.DiversiTypeTransformation;
+import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import spoon.reflect.code.CtConstructorCall;
 
-import javax.swing.*;
 import java.util.List;
 
 /**
@@ -54,20 +59,60 @@ public class MutationMojo extends AbstractMojo{
      */
     private List<String> testFailMainProject;
 
+    private String tmpDir;
+
+    private List<CtConstructorCall> selectedCandidates;
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        getLog().info(" ** MutationMojo launch "+nChange);
-        getLog().info("constructorCall: "+ UtilsProcessorImpl.getSelectedCandidates(nChange));
-        getLog().info("I know this: "+ UtilsTestProcessorImpl.getTestSuiteFail());
 
         testFailMainProject=UtilsTestProcessorImpl.getTestSuiteFail();
 
         doMutation();
+
+
+
     }
 
+
+
     private void doMutation() {
-        //TODO
+
+        selectedCandidates=UtilsProcessorImpl.getSelectedCandidates(1);
+
+        //creation de la transformation pour l'unique point de transformation
+        //récupération du dossier source dans initUtils
+        for(int i=0;i<selectedCandidates.size();i++){
+            getLog().info("Treat the candadiate!; "+selectedCandidates.get(i));
+            ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
+
+            getLog().info("Strategy Selected: "+strategy);
+            DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),getStrategy(selectedCandidates.get(i)));
+            transformation.apply();
+            getLog().info("write transformation "+InitUtils.getSourceDirectory());
+        }
+
+        //lancement des tests
+
+        //recuperation des résultats
+
+        //stockage des données.
+
+
+        getLog().info(" ** MutationMojo launch "+1);
+        getLog().info("constructorCall: ");
+        getLog().info("I know this: " + UtilsTestProcessorImpl.getTestSuiteFail());
+    }
+
+    /**
+     * TODO treat parameters and switch strategy
+     * @param ctConstructorCall
+     * @return
+     */
+    public ChangeConcreteTypeStrategy getStrategy(CtConstructorCall ctConstructorCall) {
+
+        return new OneConcreteTypeStrategy("java.util.LinkedList");
     }
 }

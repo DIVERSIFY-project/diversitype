@@ -1,5 +1,6 @@
 package fr.inria.diversify.logger;
 
+import fr.inria.diversify.utils.InitUtils;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.reference.CtTypeReference;
@@ -111,7 +112,7 @@ public class LogWriter {
     public static void printStatisticList() throws FileNotFoundException {
         ShutdownHookLog shutdownHook = new ShutdownHookLog();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
-        fileWriter = new PrintWriter("listStatistics.txt");
+        fileWriter = new PrintWriter(InitUtils.getOutput()+"listStatistics.txt");
 
         Set<String> keys = statisticList.keySet();
         Iterator<String> it = keys.iterator();

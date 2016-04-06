@@ -4,6 +4,7 @@ package fr.inria.diversify.mojo.search;
 
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.processor.StatisticsListProcessor;
+import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -24,14 +25,12 @@ import java.io.IOException;
  *
  * @requiresProject True
  *
+ *
  * Created by guerin on 04/02/16.
  */
 public class SearchMojo extends AbstractMojo {
 
-    /**
-     *
-     */
-    private File outputDirectory;
+
 
 
     /**
@@ -50,21 +49,35 @@ public class SearchMojo extends AbstractMojo {
      */
     private String interfaces;
 
+
+
     public void execute()
         throws MojoExecutionException
     {
-        getLog().info(" * Search mojo - Execute with: "+projectDirectory);
-        spoonLauncher();
+
+        try {
+            getLog().info(" * Search mojo - Execute with: " + projectDirectory);
+            InitUtils.init(projectDirectory);
+            //UtilsProcessorImpl.init(projectDirectory);
+            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getOutput(), new StatisticsListProcessor(interfaces));
+            LogWriter.printStatisticList();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public void spoonLauncher(){
+    /*public void spoonLauncher(){
 
-        UtilsProcessorImpl.setProject(projectDirectory);
-
+        InitUtils.setProject(projectDirectory);
         final SpoonAPI spoon = new Launcher();
         spoon.addInputResource(projectDirectory + "/src/main/java/");
-        spoon.setSourceOutputDirectory(projectDirectory + "/target/");
+        spoon.setSourceOutputDirectory(projectDirectory + outputDirectory);
         spoon.addProcessor(new StatisticsListProcessor(interfaces));
         spoon.run();
 
@@ -75,6 +88,6 @@ public class SearchMojo extends AbstractMojo {
         }
 
 
-    }
+    }*/
 
 }

@@ -2,6 +2,7 @@ package fr.inria.diversify.mojo.executedTests;
 
 import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 
+import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
@@ -33,7 +34,7 @@ public class ExecutedTestsMojo extends AbstractMojo {
     }
 
     private void initializeMojo() {
-        projectDirectory= UtilsProcessorImpl.getProject();
+        projectDirectory= InitUtils.getProjectDirectory();
         testResultDirectory=projectDirectory+"/target/surefire-reports/";
     }
 }
