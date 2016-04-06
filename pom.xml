@@ -75,6 +75,33 @@
       </plugin>
 
       <plugin>
+        <groupId>fr.inria.diversify</groupId>
+        <artifactId>DiversiType</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <projectDirectory>/home/guerin/Documents/INRIA/ExProj/ProjA/</projectDirectory>
+          <interfaces>java.util.List</interfaces>
+          <nChange>1</nChange>
+        </configuration>
+        <executions>
+          <execution>
+            <id>search execution</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>search</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>mutation exectution</id>
+            <phase>test</phase>
+            <goals>
+              <goal>mutation</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>

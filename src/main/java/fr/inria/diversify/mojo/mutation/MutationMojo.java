@@ -80,7 +80,7 @@ public class MutationMojo extends AbstractMojo{
 
     private void doMutation() {
 
-        selectedCandidates=UtilsProcessorImpl.getSelectedCandidates(1);
+        selectedCandidates=UtilsProcessorImpl.getSelectedCandidates(nChange);
 
         //creation de la transformation pour l'unique point de transformation
         //récupération du dossier source dans initUtils
@@ -92,18 +92,16 @@ public class MutationMojo extends AbstractMojo{
             DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),getStrategy(selectedCandidates.get(i)));
             transformation.apply();
             getLog().info("write transformation "+InitUtils.getSourceDirectory());
+            //lancement des tests
+
+            //recuperation des résultats
+
+            //stockage des données.
+
+            //restoration
+            transformation.restore();
         }
 
-        //lancement des tests
-
-        //recuperation des résultats
-
-        //stockage des données.
-
-
-        getLog().info(" ** MutationMojo launch "+1);
-        getLog().info("constructorCall: ");
-        getLog().info("I know this: " + UtilsTestProcessorImpl.getTestSuiteFail());
     }
 
     /**

@@ -28,6 +28,7 @@ public class DiversiTypeTransformation implements Transformation{
     private CtConstructorCall elementsToChange;
     private String output;
     private ChangeConcreteTypeStrategy strategy;
+    private CtExpression newElement;
 
 
     public DiversiTypeTransformation(CtConstructorCall ctConstructorCall, String outputDir,ChangeConcreteTypeStrategy strategy){
@@ -42,11 +43,22 @@ public class DiversiTypeTransformation implements Transformation{
 
         strategy.setElementToModify(elementsToChange);
 
-        CtExpression newElem=(CtConstructorCall)strategy.getElementToTransplant();
+        newElement=(CtConstructorCall)strategy.getElementToTransplant();
 
         //Voir pour la nouvelle version de spoon
         //elementsToChange.replace(newElem);
-        elementsToChange.replace(newElem);
+        elementsToChange.replace(newElement);
+
+        try {
+            printJavaFile(output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void restore(){
+        newElement.replace(elementsToChange);
 
         try {
             printJavaFile(output);
