@@ -1,10 +1,13 @@
 package fr.inria.diversify.mojo.mutation;
 
+import fr.inria.diversify.buildSystem.AbstractBuilder;
+import fr.inria.diversify.buildSystem.maven.MavenBuilder;
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.Strategy;
 import fr.inria.diversify.mojo.mutation.transformation.DiversiTypeTransformation;
 import fr.inria.diversify.utils.InitUtils;
+import fr.inria.diversify.utils.Log;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
@@ -12,6 +15,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import spoon.reflect.code.CtConstructorCall;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -67,40 +71,51 @@ public class MutationMojo extends AbstractMojo{
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-
         testFailMainProject=UtilsTestProcessorImpl.getTestSuiteFail();
 
+        addWatcherClass();
+
+        instrumentalizeTestSuite();
+
         doMutation();
-
-
-
     }
-
 
 
     private void doMutation() {
 
         selectedCandidates=UtilsProcessorImpl.getSelectedCandidates(nChange);
 
-        //creation de la transformation pour l'unique point de transformation
-        //récupération du dossier source dans initUtils
+
         for(int i=0;i<selectedCandidates.size();i++){
+
+
             getLog().info("Treat the candadiate!; "+selectedCandidates.get(i));
             ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
+            getLog().info("Strategy Selected: " + strategy);
 
-            getLog().info("Strategy Selected: "+strategy);
             DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),getStrategy(selectedCandidates.get(i)));
             transformation.apply();
-            getLog().info("write transformation "+InitUtils.getSourceDirectory());
-            //lancement des tests
+            getLog().info("write transformation " + InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory());
+
+            getLog().info("run transformation to "+InitUtils.getTmpDirectory());
+            UtilsTestProcessorImpl.runTest(InitUtils.getTmpDirectory());
 
             //recuperation des résultats
+
 
             //stockage des données.
 
             //restoration
             transformation.restore();
         }
+
+    }
+
+    private void instrumentalizeTestSuite() {
+
+    }
+
+    private void addWatcherClass() {
 
     }
 

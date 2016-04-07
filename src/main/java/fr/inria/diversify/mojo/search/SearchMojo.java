@@ -57,8 +57,11 @@ public class SearchMojo extends AbstractMojo {
 
         try {
             getLog().info(" * Search mojo - Execute with: " + projectDirectory);
+
+            //initialization of tmpDir
             InitUtils.init(projectDirectory);
-            //UtilsProcessorImpl.init(projectDirectory);
+
+            //analyse source code
             UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getOutput(), new StatisticsListProcessor(interfaces));
             LogWriter.printStatisticList();
 

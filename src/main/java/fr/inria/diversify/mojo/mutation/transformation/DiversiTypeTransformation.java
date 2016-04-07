@@ -1,16 +1,18 @@
 package fr.inria.diversify.mojo.mutation.transformation;
 
+import fr.inria.diversify.logger.MutationWatcher;
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.RandomConcreteTypeStrategy;
+import fr.inria.diversify.utils.UtilsProcessorImpl;
 import org.apache.maven.plugin.logging.Log;
 import spoon.compiler.Environment;
-import spoon.reflect.code.CtConstructorCall;
-import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.visitor.DefaultJavaPrettyPrinter;
+import spoon.reflect.visitor.Parent;
 import spoon.support.JavaOutputProcessor;
 
 import java.io.File;
@@ -29,7 +31,7 @@ public class DiversiTypeTransformation implements Transformation{
     private String output;
     private ChangeConcreteTypeStrategy strategy;
     private CtExpression newElement;
-
+    private CtCodeSnippetStatement watcher;
 
     public DiversiTypeTransformation(CtConstructorCall ctConstructorCall, String outputDir,ChangeConcreteTypeStrategy strategy){
 
@@ -47,6 +49,7 @@ public class DiversiTypeTransformation implements Transformation{
 
         //Voir pour la nouvelle version de spoon
         //elementsToChange.replace(newElem);
+        addWatcher(elementsToChange);
         elementsToChange.replace(newElement);
 
         try {
@@ -57,7 +60,18 @@ public class DiversiTypeTransformation implements Transformation{
 
     }
 
+    private void addWatcher(CtConstructorCall elementsToChange) {
+        CtElement parent=elementsToChange.getParent();
+        while(!(parent instanceof CtStatement)){
+            parent=parent.getParent();
+        }
+
+        watcher=parent.getFactory().Code().createCodeSnippetStatement("");
+        ((CtStatement)parent).insertBefore(watcher);
+    }
+
     public void restore(){
+        watcher.replace(null);
         newElement.replace(elementsToChange);
 
         try {

@@ -1,5 +1,10 @@
 package fr.inria.diversify.utils;
 
+
+import fr.inria.diversify.buildSystem.AbstractBuilder;
+import fr.inria.diversify.buildSystem.maven.MavenBuilder;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,5 +33,22 @@ public class UtilsTestProcessorImpl {
     public static void clean() {
         testSuiteFail=new ArrayList<>();
 
+    }
+
+
+    public static void runTest(String repo){
+        //lancement des tests
+        AbstractBuilder builder= null;
+        try {
+            builder = new MavenBuilder(repo);
+            builder.setGoals(new String[]{"clean test"});
+            builder.initTimeOut();
+            builder.runBuilder();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
