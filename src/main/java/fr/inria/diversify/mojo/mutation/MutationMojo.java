@@ -1,22 +1,21 @@
 package fr.inria.diversify.mojo.mutation;
 
-import fr.inria.diversify.buildSystem.AbstractBuilder;
-import fr.inria.diversify.buildSystem.maven.MavenBuilder;
 import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
-import fr.inria.diversify.mojo.mutation.strategy.Strategy;
 import fr.inria.diversify.mojo.mutation.transformation.DiversiTypeTransformation;
 import fr.inria.diversify.utils.InitUtils;
-import fr.inria.diversify.utils.Log;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import spoon.processing.Processor;
 import spoon.reflect.code.CtConstructorCall;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -67,6 +66,7 @@ public class MutationMojo extends AbstractMojo{
     private String tmpDir;
 
     private List<CtConstructorCall> selectedCandidates;
+
 
 
     @Override
@@ -123,9 +123,7 @@ public class MutationMojo extends AbstractMojo{
         //TODO instrumentalizeTestSUite
     }
 
-    private void addWatcherClass() {
 
-    }
 
     /**
      * TODO treat parameters and switch strategy
@@ -135,5 +133,48 @@ public class MutationMojo extends AbstractMojo{
     public ChangeConcreteTypeStrategy getStrategy(CtConstructorCall ctConstructorCall) {
 
         return new OneConcreteTypeStrategy("java.util.LinkedList");
+    }
+
+
+    private void addWatcherClass() {
+        try {
+            createPackage();
+            PrintWriter file=new PrintWriter(InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory()+"fr/inria/diversify/diversitype/MutationWatcher.java");
+            file.write(getWatcherBody());
+            file.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createPackage() {
+        if(! new File(InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory()+"fr/inria/diversify/diversitype/").exists()){
+            new File(InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory()+"fr/inria/diversify/diversitype/").mkdirs();
+        }
+    }
+
+    public String getWatcherBody() {
+        String body=" package fr.inria.diversify.diversitype;\n\n"
+                +"import java.io.FileWriter;\n"
+                +"import java.io.IOException;\n\n"
+                +"public class MutationWatcher {\n"
+                +"public static String currentTest;\n"
+                +"public static FileWriter fileWriter;\n\n"
+                +"public static void setCurrentTest(String s){\n"
+                +"\tcurrentTest=s;"
+                +"}\n\n"
+                +"public static void setCurrentTransfo(String position){\n"
+                +"try {\n"
+                +"if(fileWriter==null){\n"
+                +"fileWriter=new FileWriter("+InitUtils.getTmpDirectory()+"/resultTestCaseTransfo.txt);\n"
+                +"}\n"
+                +"fileWriter.write(currentTest+\":\"+position,true);\n"
+                +"fileWriter.flush();\n"
+                +"} catch (IOException e) {\n"
+                +"e.printStackTrace();\n"
+                +"}}}";
+
+
+        return body;
     }
 }
