@@ -20,9 +20,12 @@ import java.util.jar.Attributes;
  */
 public class XmlFileParser {
 
-    public static void treat(File file) {
+    private static boolean isPrinicipalProg;
+
+    public static void treat(File file, boolean isMainProg) {
         XMLReader reader;
         TestFileHandler handler = new TestFileHandler();
+        isPrinicipalProg=isMainProg;
         try{
             reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             reader.setContentHandler(handler);
@@ -109,7 +112,11 @@ public class XmlFileParser {
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if(localName.equals("failure")){
-                UtilsTestProcessorImpl.addTestFail(testSuiteCurrent,testCaseCurrent,failure,data);
+                if(isPrinicipalProg){
+                    UtilsTestProcessorImpl.addTestFail(testSuiteCurrent,testCaseCurrent,failure,data);
+                }else{
+                    UtilsTestProcessorImpl.addTestFailMutation(testSuiteCurrent,testCaseCurrent,failure,data);
+                }
             }
         }
 

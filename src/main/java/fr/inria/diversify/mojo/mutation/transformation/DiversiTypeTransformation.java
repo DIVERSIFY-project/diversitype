@@ -66,6 +66,7 @@ public class DiversiTypeTransformation implements Transformation{
             parent=parent.getParent();
         }
 
+        //TODO add createCodeSnippet
         watcher=parent.getFactory().Code().createCodeSnippetStatement("");
         ((CtStatement)parent).insertBefore(watcher);
     }
@@ -83,19 +84,12 @@ public class DiversiTypeTransformation implements Transformation{
     }
 
     public void printJavaFile(String directory) throws IOException {
-
         CtType<?> type = getOriginalClass(elementsToChange);
-
         Factory factory = type.getFactory();
-
         Environment env = factory.getEnvironment();
-
         JavaOutputProcessor processor = new JavaOutputProcessor(new File(directory), new DefaultJavaPrettyPrinter(env));
-
         processor.setFactory(factory);
-
         processor.createJavaFile(type);
-
 
     }
 

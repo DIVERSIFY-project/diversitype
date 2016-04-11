@@ -2,6 +2,7 @@ package fr.inria.diversify.mojo.mutation;
 
 import fr.inria.diversify.buildSystem.AbstractBuilder;
 import fr.inria.diversify.buildSystem.maven.MavenBuilder;
+import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.Strategy;
@@ -72,6 +73,7 @@ public class MutationMojo extends AbstractMojo{
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         testFailMainProject=UtilsTestProcessorImpl.getTestSuiteFail();
+        getLog().info("for principal project: "+testFailMainProject+" failed !");
 
         addWatcherClass();
 
@@ -97,13 +99,19 @@ public class MutationMojo extends AbstractMojo{
             transformation.apply();
             getLog().info("write transformation " + InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory());
 
-            getLog().info("run transformation to "+InitUtils.getTmpDirectory());
+            getLog().info("run test to " + InitUtils.getTmpDirectory());
             UtilsTestProcessorImpl.runTest(InitUtils.getTmpDirectory());
 
             //recuperation des résultats
+            UtilsTestProcessorImpl.cleanTestFailMutation();
+            getLog().info("analyse test result");
+            XmlParserInstru.start(InitUtils.getTmpDirectory(),false);
+            getLog().info("for mutation project: "+UtilsTestProcessorImpl.getTestSuiteFailCurrentT()+" failed !");
 
 
             //stockage des données.
+
+
 
             //restoration
             transformation.restore();
@@ -112,7 +120,7 @@ public class MutationMojo extends AbstractMojo{
     }
 
     private void instrumentalizeTestSuite() {
-
+        //TODO instrumentalizeTestSUite
     }
 
     private void addWatcherClass() {

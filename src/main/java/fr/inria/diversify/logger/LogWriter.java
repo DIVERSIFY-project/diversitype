@@ -205,6 +205,7 @@ public class LogWriter {
             fileWriter.write(current + ": " + typeArgumentList.get(current) + "\n");
         }
 
+        fileWriter.close();
 
     }
 

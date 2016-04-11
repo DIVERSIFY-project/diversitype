@@ -18,6 +18,8 @@ public class UtilsTestProcessorImpl {
 
     private static List<String> testSuiteFail=new ArrayList<>();
 
+    private static List<String> testSuiteFailCurrentT=new ArrayList<>();
+
 
     public static void addTestFail(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
         if(!testSuiteFail.contains(testSuiteCurrent)){
@@ -50,5 +52,19 @@ public class UtilsTestProcessorImpl {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void addTestFailMutation(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
+        if(!testSuiteFailCurrentT.contains(testSuiteCurrent)){
+            testSuiteFailCurrentT.add(testSuiteCurrent);
+        }
+    }
+
+    public static List<String> getTestSuiteFailCurrentT() {
+        return testSuiteFailCurrentT;
+    }
+
+    public static void cleanTestFailMutation(){
+        testSuiteFailCurrentT=new ArrayList<>();
     }
 }

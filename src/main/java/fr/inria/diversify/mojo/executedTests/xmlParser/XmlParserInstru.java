@@ -14,10 +14,13 @@ import java.util.regex.Pattern;
  */
 public class XmlParserInstru {
 
-    public static void start(String testResultDirectory) {
+    private static boolean isMainProg;
+
+    public static void start(String testResultDirectory, boolean isPrincipalProject) {
         File root=new File(testResultDirectory);
         Pattern name= Pattern.compile("(TEST-)(.)*(xml)");
-        UtilsTestProcessorImpl.clean();
+        isMainProg=isPrincipalProject;
+
         findByFilter(root, name);
 
     }
@@ -30,7 +33,7 @@ public class XmlParserInstru {
             if (children.size() > 0) {
                 for(int i=0;i<children.size();i++){
                     if(children.get(i).length()!=0) {
-                        XmlFileParser.treat(children.get(i));
+                        XmlFileParser.treat(children.get(i),isMainProg);
                     }
                 }
             }

@@ -28,8 +28,9 @@ public class ExecutedTestsMojo extends AbstractMojo {
         initializeMojo();
         getLog().info(" *** ExecutesTestMojo: " + projectDirectory + " " + testResultDirectory);
 
+        UtilsTestProcessorImpl.clean();
         //analyser chaque fichier TEST-project.classTest.xml
-        XmlParserInstru.start(testResultDirectory);
+        XmlParserInstru.start(testResultDirectory,true);
 
     }
 
