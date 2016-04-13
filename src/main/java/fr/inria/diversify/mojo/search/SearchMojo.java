@@ -62,7 +62,7 @@ public class SearchMojo extends AbstractMojo {
             InitUtils.init(projectDirectory);
 
             //analyse source code
-            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getOutput(), new StatisticsListProcessor(interfaces));
+            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(), new StatisticsListProcessor(interfaces),false);
             LogWriter.printStatisticList();
 
         } catch (FileNotFoundException e) {

@@ -4,14 +4,22 @@ import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.transformation.DiversiTypeTransformation;
+import fr.inria.diversify.processor.TestWatcherProcessor;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import spoon.compiler.Environment;
+import spoon.processing.ProcessingManager;
 import spoon.processing.Processor;
 import spoon.reflect.code.CtConstructorCall;
+import spoon.reflect.declaration.CtType;
+import spoon.reflect.factory.Factory;
+import spoon.reflect.visitor.DefaultJavaPrettyPrinter;
+import spoon.support.JavaOutputProcessor;
+import spoon.support.QueueProcessingManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -121,8 +129,17 @@ public class MutationMojo extends AbstractMojo{
 
     private void instrumentalizeTestSuite() {
         //TODO instrumentalizeTestSUite
+        InitUtils.resolveDepedencies(InitUtils.getTmpDirectory());
+
+        UtilsProcessorImpl.spoonLauncher(InitUtils.getProjectDirectory(),InitUtils.getTmpDirectory()+InitUtils.getTestDirectory(),new TestWatcherProcessor(),true);
+
+
+
     }
 
+    private void printJavaFile(Factory factory) {
+
+    }
 
 
     /**
@@ -166,9 +183,9 @@ public class MutationMojo extends AbstractMojo{
                 +"public static void setCurrentTransfo(String position){\n"
                 +"try {\n"
                 +"if(fileWriter==null){\n"
-                +"fileWriter=new FileWriter("+InitUtils.getTmpDirectory()+"/resultTestCaseTransfo.txt);\n"
+                +"fileWriter=new FileWriter(\""+InitUtils.getOutput()+"resultTestCaseTransfo.txt\");\n"
                 +"}\n"
-                +"fileWriter.write(currentTest+\":\"+position,true);\n"
+                +"fileWriter.write(currentTest+\":\"+position);\n"
                 +"fileWriter.flush();\n"
                 +"} catch (IOException e) {\n"
                 +"e.printStackTrace();\n"

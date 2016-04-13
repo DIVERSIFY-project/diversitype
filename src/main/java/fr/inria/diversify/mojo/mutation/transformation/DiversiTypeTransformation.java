@@ -1,6 +1,6 @@
 package fr.inria.diversify.mojo.mutation.transformation;
 
-import fr.inria.diversify.logger.MutationWatcher;
+
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.RandomConcreteTypeStrategy;
@@ -67,7 +67,7 @@ public class DiversiTypeTransformation implements Transformation{
         }
 
         //TODO add createCodeSnippet
-        watcher=parent.getFactory().Code().createCodeSnippetStatement("");
+        watcher=parent.getFactory().Code().createCodeSnippetStatement("fr.inria.diversify.diversitype.MutationWatcher.setCurrentTransfo(\""+elementsToChange.getPosition().toString()+"\")");
         ((CtStatement)parent).insertBefore(watcher);
     }
 

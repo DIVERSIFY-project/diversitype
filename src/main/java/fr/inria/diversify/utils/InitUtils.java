@@ -1,5 +1,7 @@
 package fr.inria.diversify.utils;
 
+
+import fr.inria.diversify.buildSystem.maven.MavenDependencyResolver;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -28,10 +30,16 @@ public class InitUtils {
      */
     private static String projectDirectory;
 
+
     /**
      * source directory
      */
     private static String srcDir="src/main/java/";
+
+    /**
+     * Test directory
+     */
+    private static String testDir="src/test/java";
 
     /**
      * tmpDirectory contains sosies during plugin's process
@@ -42,14 +50,19 @@ public class InitUtils {
      * OutputDirectory is directory that contains plugin's result
      */
     private static String outputDirectory;
-    private static String ext="/target/diversiType/";
+    private static String ext="target/diversiType/";
     private static boolean alreadyInit=false;
 
 
     public static String init(String dirProject) throws IOException, InterruptedException {
+        resolveDepedencies(dirProject);
+
         if(alreadyInit){
+
             return tmpDirectory;
         }
+
+
 
         projectDirectory=dirProject;
         outputDirectory=projectDirectory+ext;
@@ -59,10 +72,21 @@ public class InitUtils {
         dir.mkdirs();
         FileUtils.copyDirectory(new File(dirProject), dir, new TargetFileFilter());
 
+
         initPomTmp();
 
         alreadyInit=true;
         return tmpDirectory;
+    }
+
+    public static void resolveDepedencies(String dirProject){
+        MavenDependencyResolver mavenDependencyResolver=new MavenDependencyResolver();
+        try {
+            mavenDependencyResolver.DependencyResolver(dirProject+"pom.xml");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void initPomTmp() {
@@ -129,7 +153,9 @@ public class InitUtils {
         InitUtils.tmpDirectory = tmpDirectory;
     }
 
-
+    public static String getTestDirectory(){
+        return testDir;
+    }
 
     public static String getSourceDirectory(){
         return srcDir;

@@ -72,15 +72,21 @@ public class UtilsProcessorImpl {
         return selected;
     }
 
-    public static void spoonLauncher(String projectDirectory,String output,Processor processor){
+    public static Factory spoonLauncher(String projectDirectory,String output,Processor processor,boolean onlyTest){
 
 
         //InitUtils.setProject(projectDirectory);
         final SpoonAPI spoon = new Launcher();
-        spoon.addInputResource(projectDirectory + "/src/main/java/");
-        spoon.setSourceOutputDirectory(projectDirectory + output);
+
+        if(onlyTest) {
+            spoon.addInputResource(projectDirectory + InitUtils.getTestDirectory());
+        }else{
+            spoon.addInputResource(projectDirectory + InitUtils.getSourceDirectory());
+        }
+        spoon.setSourceOutputDirectory(output);
         spoon.addProcessor(processor);
         spoon.run();
+        return spoon.getFactory();
 
     }
 
