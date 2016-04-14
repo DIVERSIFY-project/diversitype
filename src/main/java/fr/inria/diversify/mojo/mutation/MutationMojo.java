@@ -21,9 +21,9 @@ import spoon.reflect.visitor.DefaultJavaPrettyPrinter;
 import spoon.support.JavaOutputProcessor;
 import spoon.support.QueueProcessingManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -117,8 +117,11 @@ public class MutationMojo extends AbstractMojo{
             getLog().info("for mutation project: "+UtilsTestProcessorImpl.getTestSuiteFailCurrentT()+" failed !");
 
 
-            //stockage des données.
+            //recupération de la couverture
+            HashMap<String,List<String>> hashMap=analyseCoverageResult(InitUtils.getOutput());
 
+            //compare coverage and testFailed
+            List<String> list=compareResults(hashMap,UtilsTestProcessorImpl.getTestSuiteFailCurrentT(),selectedCandidates.get(i));
 
 
             //restoration
@@ -127,19 +130,59 @@ public class MutationMojo extends AbstractMojo{
 
     }
 
+    private List<String> compareResults(HashMap<String, List<String>> hashMap, List<String> testSuiteFailCurrentT, CtConstructorCall ctConstructorCall) {
+        List<String> coverageTests=hashMap.get(ctConstructorCall.getPosition().toString());
+
+        for(int i=0;i<coverageTests.size();i++){
+            if(!testSuiteFailCurrentT.contains(coverageTests.get(i))){
+                coverageTests.remove(coverageTests.get(i));
+            }
+        }
+
+        return coverageTests;
+    }
+
+    private HashMap<String,List<String>> analyseCoverageResult(String output) {
+        HashMap<String,List<String>> results=new HashMap<>();
+        try {
+
+
+            FileReader file=new FileReader(""+InitUtils.getOutput()+"resultTestCaseTransfo.txt");
+            BufferedReader bufferedReader=new BufferedReader(file);
+
+           String current= bufferedReader.readLine();
+            while(current!=null){
+                String[] tab=current.split("::::");
+                if(results.containsKey(tab[1])){
+                    List<String> tests=results.get(tab[1]);
+                    tests.add(tab[0]);
+                }else{
+                    List<String> list=new ArrayList<>();
+                    list.add(tab[0]);
+                    results.put(tab[1],list);
+                }
+
+                current=bufferedReader.readLine();
+            }
+
+            bufferedReader.close();
+            file.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            return results;
+        }
+
+    }
+
     private void instrumentalizeTestSuite() {
-        //TODO instrumentalizeTestSUite
         InitUtils.resolveDepedencies(InitUtils.getTmpDirectory());
-
         UtilsProcessorImpl.spoonLauncher(InitUtils.getProjectDirectory(),InitUtils.getTmpDirectory()+InitUtils.getTestDirectory(),new TestWatcherProcessor(),true);
-
-
-
     }
 
-    private void printJavaFile(Factory factory) {
-
-    }
 
 
     /**
@@ -170,7 +213,7 @@ public class MutationMojo extends AbstractMojo{
         }
     }
 
-    public String getWatcherBody() {
+    private String getWatcherBody() {
         String body=" package fr.inria.diversify.diversitype;\n\n"
                 +"import java.io.FileWriter;\n"
                 +"import java.io.IOException;\n\n"
@@ -185,7 +228,7 @@ public class MutationMojo extends AbstractMojo{
                 +"if(fileWriter==null){\n"
                 +"fileWriter=new FileWriter(\""+InitUtils.getOutput()+"resultTestCaseTransfo.txt\");\n"
                 +"}\n"
-                +"fileWriter.write(currentTest+\":\"+position);\n"
+                +"fileWriter.write(currentTest+\"::::\"+position);\n"
                 +"fileWriter.flush();\n"
                 +"} catch (IOException e) {\n"
                 +"e.printStackTrace();\n"
