@@ -88,6 +88,8 @@ public class MutationMojo extends AbstractMojo{
         instrumentalizeTestSuite();
 
         doMutation();
+
+        //printOutResult
     }
 
 
@@ -101,7 +103,7 @@ public class MutationMojo extends AbstractMojo{
 
             getLog().info("Treat the candadiate!; "+selectedCandidates.get(i));
             ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
-            getLog().info("Strategy Selected: " + strategy);
+            getLog().info("MutationStrategy Selected: " + strategy);
 
             DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),getStrategy(selectedCandidates.get(i)));
             transformation.apply();
@@ -110,14 +112,14 @@ public class MutationMojo extends AbstractMojo{
             getLog().info("run test to " + InitUtils.getTmpDirectory());
             UtilsTestProcessorImpl.runTest(InitUtils.getTmpDirectory());
 
-            //recuperation des résultats
+            //recuperation des résultats de l'execution de tests pour la transfo courante
             UtilsTestProcessorImpl.cleanTestFailMutation();
             getLog().info("analyse test result");
             XmlParserInstru.start(InitUtils.getTmpDirectory(),false);
             getLog().info("for mutation project: "+UtilsTestProcessorImpl.getTestSuiteFailCurrentT()+" failed !");
 
 
-            //recupération de la couverture
+            //recupération de la couverture (resutlTestCaseTransfo.txt)
             HashMap<String,List<String>> hashMap=analyseCoverageResult(InitUtils.getOutput());
 
             //compare coverage and testFailed

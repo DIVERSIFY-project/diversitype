@@ -2,6 +2,8 @@ package fr.inria.diversify.utils;
 
 
 import fr.inria.diversify.buildSystem.maven.MavenDependencyResolver;
+import fr.inria.diversify.mojo.mutation.strategy.MutationStrategy;
+import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -13,10 +15,7 @@ import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -50,11 +49,29 @@ public class InitUtils {
      * OutputDirectory is directory that contains plugin's result
      */
     private static String outputDirectory;
+
+    /**
+     * directory for diversitype plugin
+     */
     private static String ext="target/diversiType/";
+
+    /**
+     * boolean for init the static class only once
+     */
     private static boolean alreadyInit=false;
 
+    /**
+     *Strategy use for select the new ConstructorCall
+     */
+    private static MutationStrategy mutationStrategy;
 
-    public static String init(String dirProject) throws IOException, InterruptedException {
+    /**
+     * Strategy for select candidates which can be mutate
+     */
+    private static CandidatesStrategy candidatesStrategy;
+
+
+    public static String init(String dirProject, String mutationStrat, String selectedCandidatesStratregy) throws IOException, InterruptedException {
         resolveDepedencies(dirProject);
 
         if(alreadyInit){
@@ -62,7 +79,8 @@ public class InitUtils {
             return tmpDirectory;
         }
 
-
+        mutationStrategy=getMutationStrategy(mutationStrat);
+        candidatesStrategy=getCandidatesStrategy(selectedCandidatesStratregy);
 
         projectDirectory=dirProject;
         outputDirectory=projectDirectory+ext;
@@ -78,6 +96,10 @@ public class InitUtils {
         alreadyInit=true;
         return tmpDirectory;
     }
+
+
+
+
 
     public static void resolveDepedencies(String dirProject){
         MavenDependencyResolver mavenDependencyResolver=new MavenDependencyResolver();
@@ -161,6 +183,14 @@ public class InitUtils {
         return srcDir;
     }
 
+    public static MutationStrategy getMutationStrategy(){
+        return mutationStrategy;
+    }
+
+    public static CandidatesStrategy getCandidatesStrategy(){
+        return candidatesStrategy;
+    }
+
     private static class TargetFileFilter implements FileFilter {
 
         @Override
@@ -169,6 +199,22 @@ public class InitUtils {
                 return false;
             }
             return true;
+        }
+    }
+
+    private static CandidatesStrategy getCandidatesStrategy(String selectedCandidatesStratregy) {
+        switch (selectedCandidatesStratregy){
+            case "internal": return CandidatesStrategy.internal;
+            case "external":return CandidatesStrategy.external;
+            default:return CandidatesStrategy.internal;
+        }
+    }
+
+    private static MutationStrategy getMutationStrategy(String mutationStrategy) {
+        switch (mutationStrategy){
+            case "one": return MutationStrategy.one;
+            case "random":return MutationStrategy.random;
+            default:return MutationStrategy.random;
         }
     }
 }

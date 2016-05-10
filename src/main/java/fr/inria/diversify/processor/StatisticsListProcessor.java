@@ -2,21 +2,13 @@ package fr.inria.diversify.processor;
 
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.logger.ShutDownHookLogClassLoader;
+import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.reflections.Reflections;
-import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtConstructorCall;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtReturn;
 import spoon.reflect.declaration.CtClass;
-import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtField;
-import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.reference.CtExecutableReference;
-import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.TypeFilter;
-import spoon.support.reflect.code.CtInvocationImpl;
-import spoon.support.reflect.code.CtLocalVariableImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +26,21 @@ public class StatisticsListProcessor extends spoon.processing.AbstractProcessor<
     private Class staticType=null;
     private List<String> allreadyTreat=new ArrayList();
 
-    public StatisticsListProcessor(String interfaces){
+    public StatisticsListProcessor(List<String> interfaces){
 
+        /*
         String[] tab=interfaces.split(";");
         for(int i=0;i<tab.length;i++){
             this.interfaces.add(tab[i]);
 
-        }
+        }*/
+        this.interfaces=interfaces;
         LogWriter.initialize(this.interfaces);
         ShutDownHookLogClassLoader shutdownHook = new ShutDownHookLogClassLoader();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
-        checkSubType();
+        if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)) {
+            checkSubType();
+        }
 
     }
 

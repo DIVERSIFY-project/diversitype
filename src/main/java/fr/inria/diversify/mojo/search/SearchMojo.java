@@ -3,18 +3,18 @@ package fr.inria.diversify.mojo.search;
 
 
 import fr.inria.diversify.logger.LogWriter;
+import fr.inria.diversify.processor.HierarchyProcessor;
 import fr.inria.diversify.processor.StatisticsListProcessor;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import spoon.Launcher;
-import spoon.SpoonAPI;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Goal which create the analyse report
@@ -42,13 +42,32 @@ public class SearchMojo extends AbstractMojo {
     private String projectDirectory;
 
     /**
+     * @parameter
+     * expression="${search.mutationStrategy}"
+     *  default-value="random"
+     *  @throws MojoExecutionException
+     */
+    private String mutationStrategy;
+
+    /**
+     * @parameter
+     * expression="${search.candidatesStrategy}"
+     *  default-value="internal"
+     *  @throws MojoExecutionException
+     */
+    private String selectedCandidatesStratregy;
+
+    /**
      *@parameter
      *  expression="${search.interfaces}"
-     *  default-value="java.util.List"
      * @throws MojoExecutionException
      */
     private String interfaces;
 
+    /**
+     * chosen interfaces for the mutation after parameters treating
+     */
+    private List<String> finalInterfaces;
 
 
     public void execute()
@@ -59,10 +78,18 @@ public class SearchMojo extends AbstractMojo {
             getLog().info(" * Search mojo - Execute with: " + projectDirectory);
 
             //initialization of tmpDir
-            InitUtils.init(projectDirectory);
+            InitUtils.init(projectDirectory, mutationStrategy, selectedCandidatesStratregy);
+
+            //create the project's hierarchy
+            if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {
+                UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+            }
+
+            //
+            finalInterfaces=getInterfaces();
 
             //analyse source code
-            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(), new StatisticsListProcessor(interfaces),false);
+            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new StatisticsListProcessor(finalInterfaces), false);
             LogWriter.printStatisticList();
 
         } catch (FileNotFoundException e) {
@@ -71,6 +98,41 @@ public class SearchMojo extends AbstractMojo {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+    }
+
+    private List<String> getInterfaces() {
+        if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
+            return getInterfacesForInternalStrategy();
+        }else if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)){
+            return getInterfacesForExternalStrategy();
+        }else{
+            //TODO
+            return new ArrayList<>();
+        }
+    }
+
+    public List<String> getInterfacesForInternalStrategy() {
+
+        return UtilsProcessorImpl.getInterfacesForInternalStrategy(splitInterfaces()) ;
+    }
+
+    public List<String> getInterfacesForExternalStrategy() {
+        return UtilsProcessorImpl.getInterfacesForExternalStrategy(splitInterfaces());
+    }
+
+    private List<String> splitInterfaces() {
+        if(interfaces==null || interfaces.equals("")){
+            return new ArrayList<>();
+        }else{
+            List<String> result= new ArrayList<>();
+            String[] tab=interfaces.split(";");
+            for(int i=0;i<tab.length;i++){
+                result.add(tab[i]);
+
+            }
+            return result;
         }
 
     }

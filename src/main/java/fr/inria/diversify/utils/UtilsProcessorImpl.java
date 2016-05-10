@@ -1,7 +1,11 @@
 package fr.inria.diversify.utils;
 
+import fr.inria.diversify.exceptions.NotInterfacesUsefullException;
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.processor.StatisticsListProcessor;
+import fr.inria.diversify.utils.selectionStrategy.CandidatesSelectStrategy;
+import fr.inria.diversify.utils.selectionStrategy.strategy.ExternalLibraryStrategy;
+import fr.inria.diversify.utils.selectionStrategy.strategy.InternalTypeStrategy;
 import spoon.Launcher;
 import spoon.SpoonAPI;
 import spoon.compiler.SpoonCompiler;
@@ -27,10 +31,7 @@ import spoon.support.reflect.code.CtLocalVariableImpl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  *
@@ -47,8 +48,16 @@ public class UtilsProcessorImpl {
     private static List<CtConstructorCall> candidates=new ArrayList<>();
     private static List<CtConstructorCall> selected=new ArrayList<>();
 
-   private static String project="";
+    private static HashMap<String,List<String>> hierarchy=new HashMap<>();
+
+    private static String project="";
     private static Factory factory;
+
+    /**
+     * List of static type for the mutation
+     */
+    private static List<String> interfaces=new ArrayList<>();
+    private static CandidatesSelectStrategy strategy;
 
 
     public static void addCandidate(CtConstructorCall ctConstructorCall){
@@ -59,17 +68,23 @@ public class UtilsProcessorImpl {
 
 
 
-        if(n>=candidates.size()){
+        /*if(n>=candidates.size()){
             return candidates;
-        }
+        }*/
+
+        strategy=getStrategy();
+        strategy.init(n);
+
+
+        /*
         Random r = new Random();
 
         for(int i=0;i<n;i++){
             int valeur =r.nextInt(candidates.size());
             selected.add(candidates.get(valeur));
-        }
+        }*/
 
-        return selected;
+        return strategy.getCandidates();
     }
 
     public static Factory spoonLauncher(String projectDirectory,String output,Processor processor,boolean onlyTest){
@@ -131,6 +146,95 @@ public class UtilsProcessorImpl {
     }
 
 
+    public static void addHierarchyLink(String superClass, String subClass) {
+        if(hierarchy.containsKey(superClass)){
+            if(!hierarchy.get(superClass).contains(subClass)) {
+                hierarchy.get(superClass).add(subClass);
+            }
+        }else{
+            List<String> list=new ArrayList<>();
+            list.add(subClass);
+            hierarchy.put(superClass,list);
+        }
 
+    }
 
+    /**
+     * Internal strategy for choose interfaces with parameter
+     * @param interf
+     * @return
+     */
+    public static List<String> getInterfacesForInternalStrategy(List<String> interf) {
+        interfaces= checkGivenInterf(interf);
+
+        if(interfaces.isEmpty()){
+            //choose in the hierarchy, an interresting interface
+            try {
+
+                interfaces.add(selectInterfaceInHierarchy().get(0));
+                return interfaces;
+            } catch (NotInterfacesUsefullException e) {
+                //TODO better processing for this exception
+                e.printStackTrace();
+                System.exit(0);
+                return null;
+            }
+        }else{
+           return interfaces;
+        }
+
+    }
+
+    private static List<String> selectInterfaceInHierarchy() throws NotInterfacesUsefullException {
+        List<String> result=new ArrayList<>();
+
+        Set<String> keys=hierarchy.keySet();
+        Iterator<String> it=keys.iterator();
+        while(it.hasNext()){
+            String current=it.next();
+            if(hierarchy.get(current).size()>1){
+                result.add(current);
+            }
+        }
+
+        if(result.isEmpty()){
+            throw  new NotInterfacesUsefullException();
+        }
+
+        return result;
+    }
+
+    private static List<String> checkGivenInterf(List<String> interf) {
+        for(int i=0;i<interf.size();i++){
+            if(!hierarchy.containsKey(interf.get(i))){
+                interf.remove(interf.get(i));
+            }
+        }
+        return interf;
+    }
+
+    /**
+     * External strategy for choose interfaces with parameter
+     * @param interf
+     * @return
+     */
+    public static List<String> getInterfacesForExternalStrategy(List<String> interf) {
+        if(interf.isEmpty()){
+            //return java.util.List ?
+            interfaces.add("java.util.List");
+            return interfaces;
+        }else{
+            //return directly interfaces?
+            return interf;
+        }
+    }
+
+    public static CandidatesSelectStrategy getStrategy() {
+        switch(InitUtils.getCandidatesStrategy()){
+            case internal:return new InternalTypeStrategy();
+            case external:return new ExternalLibraryStrategy();
+            default:return new InternalTypeStrategy();
+        }
+
+    }
 }
