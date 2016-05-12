@@ -95,7 +95,7 @@ public class XmlFileParser {
         public void startElement(String uri, String localName, String qName, org.xml.sax.Attributes atts) throws SAXException {
             switch(localName){
                 case "testsuite": testSuiteCurrent=findSpecificAtt(atts, "name");break;
-                case "testcase": testCaseCurrent=findSpecificAtt(atts,"classname"); break;
+                case "testcase": testCaseCurrent=findSpecificAtt(atts,"name"); break;
                 case "failure": failure=findSpecificAtt(atts,"type");data="";break;
             }
         }

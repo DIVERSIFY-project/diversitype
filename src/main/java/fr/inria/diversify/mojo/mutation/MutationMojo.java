@@ -93,7 +93,13 @@ public class MutationMojo extends AbstractMojo{
 
         doMutation();
 
+        deleteTmpDirectory();
+
         //printOutResult
+    }
+
+    private void deleteTmpDirectory() {
+        InitUtils.deleteTmpDirectory();
     }
 
 
@@ -166,7 +172,7 @@ public class MutationMojo extends AbstractMojo{
 
 
     private List<String> compareResults(HashMap<String, List<String>> hashMap, List<String> testSuiteFailCurrentT, CtConstructorCall ctConstructorCall) {
-        if(hashMap==null){//if the constructorCall is a field
+        if(hashMap.isEmpty()){//if the constructorCall is a field
             return testSuiteFailCurrentT;
         }else {
 
@@ -323,13 +329,13 @@ public class MutationMojo extends AbstractMojo{
         String improvement="";
         for(int i=0;i<testMainProject.size();i++){
             if(!listTestCurrentT.contains(testMainProject.get(i))){
-                improvement=improvement+testMainProject.get(i);
+                improvement=improvement+testMainProject.get(i)+"\n";
             }
         }
         if(improvement.equals("")){
-            improvement="there are not improvement with this mutation :(";
+            improvement="there are not improvement with this mutation :(\n";
         }
         improvement="** Failed test resolve by the mutation **\n"+improvement+"\n";
-        return null;
+        return improvement;
     }
 }

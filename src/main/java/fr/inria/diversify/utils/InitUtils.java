@@ -120,7 +120,7 @@ public class InitUtils {
     public static void resolveDepedencies(String dirProject){
         MavenDependencyResolver mavenDependencyResolver=new MavenDependencyResolver();
         try {
-            mavenDependencyResolver.DependencyResolver(dirProject+"pom.xml");
+            mavenDependencyResolver.DependencyResolver(dirProject + "pom.xml");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -205,6 +205,24 @@ public class InitUtils {
 
     public static CandidatesStrategy getCandidatesStrategy(){
         return candidatesStrategy;
+    }
+
+    public static void deleteTmpDirectory() {
+        File dir = new File(tmpDirectory);
+        deleteRepository(dir);
+    }
+
+    private static void deleteRepository(File r){
+        File [] fileList = r.listFiles();
+        for(int i = 0;i<fileList.length;i++){
+            if(fileList[i].isDirectory() ){
+                deleteRepository(fileList[i]);
+                fileList[i].delete();
+            }else{
+                fileList[i].delete();
+            }
+        }
+        r.delete();
     }
 
     private static class TargetFileFilter implements FileFilter {

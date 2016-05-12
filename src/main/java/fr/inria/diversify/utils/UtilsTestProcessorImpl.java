@@ -23,7 +23,8 @@ public class UtilsTestProcessorImpl {
 
     public static void addTestFail(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
         if(!testSuiteFail.contains(testSuiteCurrent)){
-            testSuiteFail.add(testSuiteCurrent);
+            //TODO bien récuperer les informations necessaire
+            testSuiteFail.add(testSuiteCurrent+":"+testCaseCurrent);
         }
         //System.out.println(testSuiteCurrent+" testCase: "+testCaseCurrent+" failure: "+failure+" data: "+data);
     }
@@ -56,7 +57,7 @@ public class UtilsTestProcessorImpl {
 
     public static void addTestFailMutation(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
         if(!testSuiteFailCurrentT.contains(testSuiteCurrent)){
-            testSuiteFailCurrentT.add(testSuiteCurrent);
+            testSuiteFailCurrentT.add(testSuiteCurrent+":"+testCaseCurrent);
         }
     }
 
