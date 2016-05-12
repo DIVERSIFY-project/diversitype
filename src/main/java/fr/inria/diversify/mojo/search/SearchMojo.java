@@ -85,7 +85,7 @@ public class SearchMojo extends AbstractMojo {
                 UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
             }
 
-            //
+            //treat given parameters and deduct the static type use during the mutation
             finalInterfaces=getInterfaces();
 
             //analyse source code
@@ -103,24 +103,28 @@ public class SearchMojo extends AbstractMojo {
     }
 
     private List<String> getInterfaces() {
-        if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
+
+        return UtilsProcessorImpl.getInterfacesFromStrategy(splitInterfaces());
+
+        /*if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
             return getInterfacesForInternalStrategy();
         }else if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)){
             return getInterfacesForExternalStrategy();
         }else{
             //TODO
             return new ArrayList<>();
-        }
+        }*/
     }
 
-    public List<String> getInterfacesForInternalStrategy() {
+    /*public List<String> getInterfacesForInternalStrategy() {
 
-        return UtilsProcessorImpl.getInterfacesForInternalStrategy(splitInterfaces()) ;
+        //return UtilsProcessorImpl.getInterfacesForInternalStrategy(splitInterfaces()) ;
     }
 
     public List<String> getInterfacesForExternalStrategy() {
-        return UtilsProcessorImpl.getInterfacesForExternalStrategy(splitInterfaces());
-    }
+        //return UtilsProcessorImpl.getInterfacesForExternalStrategy(splitInterfaces());
+
+    }*/
 
     private List<String> splitInterfaces() {
         if(interfaces==null || interfaces.equals("")){

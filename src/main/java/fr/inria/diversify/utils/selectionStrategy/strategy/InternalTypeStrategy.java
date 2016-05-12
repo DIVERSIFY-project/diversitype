@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class InternalTypeStrategy implements CandidatesSelectStrategy {
     @Override
-    public void init(int nbCandidates) {
+    public void init(int nbCandidates, List<CtConstructorCall> candidates) {
 
     }
 

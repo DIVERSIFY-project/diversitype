@@ -38,16 +38,16 @@ public class StatisticsListProcessor extends spoon.processing.AbstractProcessor<
         LogWriter.initialize(this.interfaces);
         ShutDownHookLogClassLoader shutdownHook = new ShutDownHookLogClassLoader();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
-        if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)) {
+       /* if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)) {
             checkSubType();
-        }
+        }*/
 
     }
 
     /**
      * Check if interfaces given in parameter can be diversify
      */
-    private void checkSubType() {
+   /* private void checkSubType() {
         Reflections reflections = new Reflections(".*");
         for(int i=0;i<interfaces.size();i++){
             try {
@@ -61,7 +61,7 @@ public class StatisticsListProcessor extends spoon.processing.AbstractProcessor<
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     @Override
     public void process(CtClass ctClass) {

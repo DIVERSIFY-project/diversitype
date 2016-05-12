@@ -29,23 +29,24 @@ public class DiversiTypeTransformation implements Transformation{
 
     private CtConstructorCall elementsToChange;
     private String output;
-    private ChangeConcreteTypeStrategy strategy;
+    //private ChangeConcreteTypeStrategy strategy;
     private CtExpression newElement;
     private CtCodeSnippetStatement watcher;
+    private CtConstructorCall newCtConstructorCall;
 
-    public DiversiTypeTransformation(CtConstructorCall ctConstructorCall, String outputDir,ChangeConcreteTypeStrategy strategy){
-
+    public DiversiTypeTransformation(CtConstructorCall ctConstructorCall, String outputDir,CtConstructorCall newCtConstructorCall){
         elementsToChange=ctConstructorCall;
         output=outputDir;
-        this.strategy=strategy;
+        this.newCtConstructorCall=newCtConstructorCall;
     }
 
     @Override
     public void apply() {
 
-        strategy.setElementToModify(elementsToChange);
+        //strategy.setElementToModify(elementsToChange);
 
-        newElement=(CtConstructorCall)strategy.getElementToTransplant();
+        //newElement=(CtConstructorCall)strategy.getElementToTransplant();
+        newElement=newCtConstructorCall;
 
         //Voir pour la nouvelle version de spoon
         //elementsToChange.replace(newElem);

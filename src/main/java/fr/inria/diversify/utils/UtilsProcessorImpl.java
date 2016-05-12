@@ -4,8 +4,10 @@ import fr.inria.diversify.exceptions.NotInterfacesUsefullException;
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.processor.StatisticsListProcessor;
 import fr.inria.diversify.utils.selectionStrategy.CandidatesSelectStrategy;
+import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import fr.inria.diversify.utils.selectionStrategy.strategy.ExternalLibraryStrategy;
 import fr.inria.diversify.utils.selectionStrategy.strategy.InternalTypeStrategy;
+import org.reflections.Reflections;
 import spoon.Launcher;
 import spoon.SpoonAPI;
 import spoon.compiler.SpoonCompiler;
@@ -64,27 +66,33 @@ public class UtilsProcessorImpl {
         candidates.add(ctConstructorCall);
     }
 
+    /**
+     * Select mutation point
+     * @param n
+     * @return
+     */
     public static List<CtConstructorCall> getSelectedCandidates(int n){
 
 
 
-        /*if(n>=candidates.size()){
+        if(n>=candidates.size()){
+            selected=candidates;
             return candidates;
-        }*/
+        }
 
-        strategy=getStrategy();
-        strategy.init(n);
+        /*strategy=getStrategy();
+        strategy.init(n,candidates);
+        selected=strategy.getCandidates();*/
 
 
-        /*
         Random r = new Random();
 
         for(int i=0;i<n;i++){
             int valeur =r.nextInt(candidates.size());
             selected.add(candidates.get(valeur));
-        }*/
+        }
 
-        return strategy.getCandidates();
+        return selected;
     }
 
     public static Factory spoonLauncher(String projectDirectory,String output,Processor processor,boolean onlyTest){
@@ -164,15 +172,15 @@ public class UtilsProcessorImpl {
      * @param interf
      * @return
      */
-    public static List<String> getInterfacesForInternalStrategy(List<String> interf) {
-        interfaces= checkGivenInterf(interf);
+    private static List<String> getInterfacesForInternalStrategy(List<String> interf) {
+        List<String> internalInterfaces= checkGivenInterf(interf);
 
-        if(interfaces.isEmpty()){
+        if(internalInterfaces.isEmpty()){
             //choose in the hierarchy, an interresting interface
             try {
 
-                interfaces.add(selectInterfaceInHierarchy().get(0));
-                return interfaces;
+                internalInterfaces.add(selectInterfaceInHierarchy().get(0));
+                return internalInterfaces;
             } catch (NotInterfacesUsefullException e) {
                 //TODO better processing for this exception
                 e.printStackTrace();
@@ -180,7 +188,7 @@ public class UtilsProcessorImpl {
                 return null;
             }
         }else{
-           return interfaces;
+           return internalInterfaces;
         }
 
     }
@@ -218,15 +226,34 @@ public class UtilsProcessorImpl {
      * @param interf
      * @return
      */
-    public static List<String> getInterfacesForExternalStrategy(List<String> interf) {
-        if(interf.isEmpty()){
+    private static List<String> getInterfacesForExternalStrategy(List<String> interf) {
+        List<String> result= checkSubType(interf);
+        if(result.isEmpty()) {
             //return java.util.List ?
-            interfaces.add("java.util.List");
-            return interfaces;
-        }else{
-            //return directly interfaces?
-            return interf;
+            result.add("java.util.List");
         }
+        return result;
+    }
+
+    /**
+     * Check if interfaces given in parameter can be diversify
+     */
+    private static List<String> checkSubType(List<String> interf) {
+        Reflections reflections = new Reflections(".*");
+        for(int i=0;i<interf.size();i++){
+            try {
+                Class current=Class.forName(interf.get(i));
+                Set<Class<?>> subtypes= reflections.getSubTypesOf(current);
+
+                if(subtypes.size()<2){
+                    LogWriter.isNotAPossibility(current);
+                    interf.remove(current);
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return interf;
     }
 
     public static CandidatesSelectStrategy getStrategy() {
@@ -236,5 +263,19 @@ public class UtilsProcessorImpl {
             default:return new InternalTypeStrategy();
         }
 
+    }
+
+    public static List<String> getInterfacesFromStrategy(List<String> strings) {
+        interfaces=new ArrayList<>();
+         if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
+            interfaces= getInterfacesForInternalStrategy(strings);
+        }else if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)){
+            interfaces= getInterfacesForExternalStrategy(strings);
+        }
+        return interfaces;
+    }
+
+    public static HashMap<String, List<String>> getHierarchy() {
+        return hierarchy;
     }
 }

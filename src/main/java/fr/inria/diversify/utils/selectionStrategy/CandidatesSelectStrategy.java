@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface CandidatesSelectStrategy {
 
-    public void init(int nbCandidates);
+    public void init(int nbCandidates, List<CtConstructorCall> candidates);
     public List<CtConstructorCall> getCandidates();
 
 }

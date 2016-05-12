@@ -15,6 +15,9 @@ import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.*;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 
 /**
@@ -93,12 +96,25 @@ public class InitUtils {
 
         initPomTmp();
 
+        loadJarProject();
+
         alreadyInit=true;
         return tmpDirectory;
     }
 
-
-
+    private static void loadJarProject() {
+        URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        try{
+            //TODO get parameter for jar name
+            URL url = new File(getProjectDirectory()+"target/ProjA-1.0-SNAPSHOT.jar").toURI().toURL();
+            Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class<?>[]{URL.class});
+            addURL.setAccessible(true);
+            addURL.invoke(systemClassLoader, new Object[]{url});
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
     public static void resolveDepedencies(String dirProject){

@@ -1,6 +1,8 @@
 package fr.inria.diversify.mojo.mutation;
 
 import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
+import fr.inria.diversify.mojo.mutation.builder.ConstructorCallBuilder;
+import fr.inria.diversify.mojo.mutation.builder.ConstructorCallBuilderWithStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.ChangeConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.strategy.OneConcreteTypeStrategy;
 import fr.inria.diversify.mojo.mutation.transformation.DiversiTypeTransformation;
@@ -75,6 +77,8 @@ public class MutationMojo extends AbstractMojo{
 
     private List<CtConstructorCall> selectedCandidates;
 
+    private PrintWriter printWriter;
+
 
 
     @Override
@@ -96,16 +100,26 @@ public class MutationMojo extends AbstractMojo{
     private void doMutation() {
 
         selectedCandidates=UtilsProcessorImpl.getSelectedCandidates(nChange);
-
+        ConstructorCallBuilder constructorCallBuilder=new ConstructorCallBuilderWithStrategy();
 
         for(int i=0;i<selectedCandidates.size();i++){
 
 
             getLog().info("Treat the candadiate!; "+selectedCandidates.get(i));
-            ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
-            getLog().info("MutationStrategy Selected: " + strategy);
+            //ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
+            getLog().info("MutationStrategy Selected: " + InitUtils.getMutationStrategy());
 
-            DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),getStrategy(selectedCandidates.get(i)));
+            String staticType=UtilsProcessorImpl.getStaticType(selectedCandidates.get(i)).getName();
+
+            constructorCallBuilder.selElementToTransplant(selectedCandidates.get(i));
+            constructorCallBuilder.setStaticType(staticType);
+            constructorCallBuilder.setMutationStrategy(InitUtils.getMutationStrategy());
+            constructorCallBuilder.setSelectionStrategy(InitUtils.getCandidatesStrategy());
+
+            CtConstructorCall newCtConstructorCall=constructorCallBuilder.findCtConstructorCall();
+
+
+            DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),newCtConstructorCall);
             transformation.apply();
             getLog().info("write transformation " + InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory());
 
@@ -125,23 +139,47 @@ public class MutationMojo extends AbstractMojo{
             //compare coverage and testFailed
             List<String> list=compareResults(hashMap,UtilsTestProcessorImpl.getTestSuiteFailCurrentT(),selectedCandidates.get(i));
 
+            printResultTorCurrentTransfo(staticType,selectedCandidates.get(i),newCtConstructorCall,(hashMap==null),list,testFailMainProject);
+
 
             //restoration
             transformation.restore();
         }
 
+        getPrintWriter().close();
+
     }
 
-    private List<String> compareResults(HashMap<String, List<String>> hashMap, List<String> testSuiteFailCurrentT, CtConstructorCall ctConstructorCall) {
-        List<String> coverageTests=hashMap.get(ctConstructorCall.getPosition().toString());
-
-        for(int i=0;i<coverageTests.size();i++){
-            if(!testSuiteFailCurrentT.contains(coverageTests.get(i))){
-                coverageTests.remove(coverageTests.get(i));
-            }
+    private void printResultTorCurrentTransfo(String staticType, CtConstructorCall ctConstructorCall, CtConstructorCall newCtConstructorCall, boolean coverageIsNull, List<String> listTestCurrentT, List<String> testMainProject) {
+        PrintWriter out=getPrintWriter();
+        String result="For the mutation: static type: "+staticType+", concrete type: "+ctConstructorCall.getType()+", mutation: "+newCtConstructorCall.getType()+"\n"
+                +"mutation position: "+ctConstructorCall.getPosition().toString()+"\n" ;
+        if(coverageIsNull){
+            result=result+"the code coverage is not assured";
         }
 
-        return coverageTests;
+        result=result+"\n\n"+getCommonTest(listTestCurrentT,testMainProject)+getImprovement(listTestCurrentT,testMainProject)+getRegression(listTestCurrentT,testMainProject);
+        out.write(result);
+
+    }
+
+
+
+    private List<String> compareResults(HashMap<String, List<String>> hashMap, List<String> testSuiteFailCurrentT, CtConstructorCall ctConstructorCall) {
+        if(hashMap==null){//if the constructorCall is a field
+            return testSuiteFailCurrentT;
+        }else {
+
+            List<String> coverageTests = hashMap.get(ctConstructorCall.getPosition().toString());
+
+            for (int i = 0; i < coverageTests.size(); i++) {
+                if (!testSuiteFailCurrentT.contains(coverageTests.get(i))) {
+                    coverageTests.remove(coverageTests.get(i));
+                }
+            }
+
+            return coverageTests;
+        }
     }
 
     private HashMap<String,List<String>> analyseCoverageResult(String output) {
@@ -149,7 +187,7 @@ public class MutationMojo extends AbstractMojo{
         try {
 
 
-            FileReader file=new FileReader(""+InitUtils.getOutput()+"resultTestCaseTransfo.txt");
+            FileReader file=new FileReader(InitUtils.getOutput()+"resultTestCaseTransfo.txt");
             BufferedReader bufferedReader=new BufferedReader(file);
 
            String current= bufferedReader.readLine();
@@ -171,7 +209,8 @@ public class MutationMojo extends AbstractMojo{
             file.close();
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+           //Do something here -> the result is not print because the mutation is a field
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -189,13 +228,14 @@ public class MutationMojo extends AbstractMojo{
 
     /**
      * TODO treat parameters and switch strategy
-     * @param ctConstructorCall
+     * @param
      * @return
      */
-    public ChangeConcreteTypeStrategy getStrategy(CtConstructorCall ctConstructorCall) {
+    /*public ChangeConcreteTypeStrategy getStrategy(CtConstructorCall ctConstructorCall) {
+
 
         return new OneConcreteTypeStrategy("java.util.LinkedList");
-    }
+    }*/
 
 
     private void addWatcherClass() {
@@ -238,5 +278,58 @@ public class MutationMojo extends AbstractMojo{
 
 
         return body;
+    }
+
+    public PrintWriter getPrintWriter() {
+        if(printWriter==null){
+            try {
+                printWriter=new PrintWriter(InitUtils.getOutput()+"diversiType.txt");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return printWriter;
+    }
+
+    public String getCommonTest(List<String> listTestCurrentT, List<String> testMainProject) {
+        String commonTest="";
+        for(int i=0;i<listTestCurrentT.size();i++){
+            if(testMainProject.contains(listTestCurrentT.get(i))){
+                commonTest=commonTest+listTestCurrentT.get(i)+"\n";
+            }
+        }
+        if(commonTest.equals("")){
+            commonTest="there are not common failed test for this mutation";
+        }
+        commonTest="** Common failed test **\n"+commonTest+"\n";
+        return commonTest;
+    }
+
+    private String getRegression(List<String> listTestCurrentT, List<String> testMainProject) {
+        String regression="";
+        for(int i=0;i<listTestCurrentT.size();i++){
+            if(!testMainProject.contains(listTestCurrentT.get(i))){
+                regression=regression+listTestCurrentT.get(i)+"\n";
+            }
+        }
+        if(regression.equals("")){
+            regression="there are not new failed test for this mutation !!";
+        }
+        regression="** Failed test added by the mutation **\n"+regression+"\n";
+        return regression;
+    }
+
+    private String getImprovement(List<String> listTestCurrentT, List<String> testMainProject) {
+        String improvement="";
+        for(int i=0;i<testMainProject.size();i++){
+            if(!listTestCurrentT.contains(testMainProject.get(i))){
+                improvement=improvement+testMainProject.get(i);
+            }
+        }
+        if(improvement.equals("")){
+            improvement="there are not improvement with this mutation :(";
+        }
+        improvement="** Failed test resolve by the mutation **\n"+improvement+"\n";
+        return null;
     }
 }
