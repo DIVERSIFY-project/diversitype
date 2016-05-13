@@ -82,6 +82,7 @@ public class SearchMojo extends AbstractMojo {
 
             //create the project's hierarchy
             if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {
+                getLog().info("inspect source code and generate the hierarchy");
                 UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
             }
 
@@ -89,6 +90,7 @@ public class SearchMojo extends AbstractMojo {
             finalInterfaces=getInterfaces();
 
             //analyse source code
+            getLog().info("analyse the code source");
             UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new StatisticsListProcessor(finalInterfaces), false);
             LogWriter.printStatisticList();
 

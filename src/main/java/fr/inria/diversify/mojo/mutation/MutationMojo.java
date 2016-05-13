@@ -152,7 +152,7 @@ public class MutationMojo extends AbstractMojo{
                 //restoration
                 transformation.restore();
             }catch (NoAlternativesException e){
-                getLog().info("there are not alternative for "+selectedCandidates.get(i));
+                getLog().info("there are not alternative for the current candidates");
             }
         }
 
