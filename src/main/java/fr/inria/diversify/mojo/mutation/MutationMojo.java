@@ -1,5 +1,6 @@
 package fr.inria.diversify.mojo.mutation;
 
+import fr.inria.diversify.exceptions.NoAlternativesException;
 import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 import fr.inria.diversify.mojo.mutation.builder.ConstructorCallBuilder;
 import fr.inria.diversify.mojo.mutation.builder.ConstructorCallBuilderWithStrategy;
@@ -110,46 +111,49 @@ public class MutationMojo extends AbstractMojo{
 
         for(int i=0;i<selectedCandidates.size();i++){
 
+            try {
+                getLog().info("Treat the candadiate!; " + selectedCandidates.get(i));
+                //ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
+                getLog().info("MutationStrategy Selected: " + InitUtils.getMutationStrategy());
 
-            getLog().info("Treat the candadiate!; "+selectedCandidates.get(i));
-            //ChangeConcreteTypeStrategy strategy=getStrategy(selectedCandidates.get(i));
-            getLog().info("MutationStrategy Selected: " + InitUtils.getMutationStrategy());
+                String staticType = UtilsProcessorImpl.getStaticType(selectedCandidates.get(i)).getName();
 
-            String staticType=UtilsProcessorImpl.getStaticType(selectedCandidates.get(i)).getName();
+                constructorCallBuilder.selElementToTransplant(selectedCandidates.get(i));
+                constructorCallBuilder.setStaticType(staticType);
+                constructorCallBuilder.setMutationStrategy(InitUtils.getMutationStrategy());
+                constructorCallBuilder.setSelectionStrategy(InitUtils.getCandidatesStrategy());
 
-            constructorCallBuilder.selElementToTransplant(selectedCandidates.get(i));
-            constructorCallBuilder.setStaticType(staticType);
-            constructorCallBuilder.setMutationStrategy(InitUtils.getMutationStrategy());
-            constructorCallBuilder.setSelectionStrategy(InitUtils.getCandidatesStrategy());
-
-            CtConstructorCall newCtConstructorCall=constructorCallBuilder.findCtConstructorCall();
-
-
-            DiversiTypeTransformation transformation=new DiversiTypeTransformation(selectedCandidates.get(i),InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory(),newCtConstructorCall);
-            transformation.apply();
-            getLog().info("write transformation " + InitUtils.getTmpDirectory()+InitUtils.getSourceDirectory());
-
-            getLog().info("run test to " + InitUtils.getTmpDirectory());
-            UtilsTestProcessorImpl.runTest(InitUtils.getTmpDirectory());
-
-            //recuperation des résultats de l'execution de tests pour la transfo courante
-            UtilsTestProcessorImpl.cleanTestFailMutation();
-            getLog().info("analyse test result");
-            XmlParserInstru.start(InitUtils.getTmpDirectory(),false);
-            getLog().info("for mutation project: "+UtilsTestProcessorImpl.getTestSuiteFailCurrentT()+" failed !");
+                CtConstructorCall newCtConstructorCall = constructorCallBuilder.findCtConstructorCall();
 
 
-            //recupération de la couverture (resutlTestCaseTransfo.txt)
-            HashMap<String,List<String>> hashMap=analyseCoverageResult(InitUtils.getOutput());
+                DiversiTypeTransformation transformation = new DiversiTypeTransformation(selectedCandidates.get(i), InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), newCtConstructorCall);
+                transformation.apply();
+                getLog().info("write transformation " + InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory());
 
-            //compare coverage and testFailed
-            List<String> list=compareResults(hashMap,UtilsTestProcessorImpl.getTestSuiteFailCurrentT(),selectedCandidates.get(i));
+                getLog().info("run test to " + InitUtils.getTmpDirectory());
+                UtilsTestProcessorImpl.runTest(InitUtils.getTmpDirectory());
 
-            printResultTorCurrentTransfo(staticType,selectedCandidates.get(i),newCtConstructorCall,(hashMap==null),list,testFailMainProject);
+                //recuperation des résultats de l'execution de tests pour la transfo courante
+                UtilsTestProcessorImpl.cleanTestFailMutation();
+                getLog().info("analyse test result");
+                XmlParserInstru.start(InitUtils.getTmpDirectory(), false);
+                getLog().info("for mutation project: " + UtilsTestProcessorImpl.getTestSuiteFailCurrentT() + " failed !");
 
 
-            //restoration
-            transformation.restore();
+                //recupération de la couverture (resutlTestCaseTransfo.txt)
+                HashMap<String, List<String>> hashMap = analyseCoverageResult(InitUtils.getOutput());
+
+                //compare coverage and testFailed
+                List<String> list = compareResults(hashMap, UtilsTestProcessorImpl.getTestSuiteFailCurrentT(), selectedCandidates.get(i));
+
+                printResultTorCurrentTransfo(staticType, selectedCandidates.get(i), newCtConstructorCall, (hashMap == null), list, testFailMainProject);
+
+
+                //restoration
+                transformation.restore();
+            }catch (NoAlternativesException e){
+                getLog().info("there are not alternative for "+selectedCandidates.get(i));
+            }
         }
 
         getPrintWriter().close();

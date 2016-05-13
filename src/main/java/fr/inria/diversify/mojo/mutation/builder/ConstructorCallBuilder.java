@@ -1,5 +1,6 @@
 package fr.inria.diversify.mojo.mutation.builder;
 
+import fr.inria.diversify.exceptions.NoAlternativesException;
 import fr.inria.diversify.mojo.mutation.strategy.MutationStrategy;
 import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import spoon.reflect.code.CtConstructorCall;
@@ -15,7 +16,7 @@ public abstract class ConstructorCallBuilder {
         this.elementToTransplant=elementToTransplant;
     }
 
-    public CtConstructorCall findCtConstructorCall(){
+    public CtConstructorCall findCtConstructorCall() throws NoAlternativesException {
         return elementToTransplant;
     }
 

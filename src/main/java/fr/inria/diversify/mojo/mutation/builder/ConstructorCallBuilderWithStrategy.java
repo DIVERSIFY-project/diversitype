@@ -1,5 +1,6 @@
 package fr.inria.diversify.mojo.mutation.builder;
 
+import fr.inria.diversify.exceptions.NoAlternativesException;
 import fr.inria.diversify.mojo.mutation.strategy.MutationStrategy;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
@@ -25,9 +26,12 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
     private String staticType;
 
     @Override
-    public CtConstructorCall findCtConstructorCall(){
+    public CtConstructorCall findCtConstructorCall() throws NoAlternativesException {
         ctConstructorCall=elementToTransplant;
 
+        if(mutants.size()==0){
+            throw new NoAlternativesException();
+        }
         //create from factory
         Factory factory=elementToTransplant.getFactory();
 
