@@ -18,12 +18,16 @@ public class TestWatcherProcessor extends AbstractProcessor<CtClass>{
 
     @Override
     public void process(CtClass element) {
-        List<CtMethod> methodList=element.getElements(new TypeFilter<CtMethod>(CtMethod.class));
-        for(int i=0;i<methodList.size();i++){
-            CtBlock body=methodList.get(i).getBody();
-            CtStatement statement=element.getFactory().Code().createCodeSnippetStatement("fr.inria.diversify.diversitype.MutationWatcher.setCurrentTest(\""+element.getQualifiedName()+":"+methodList.get(i).getSimpleName()+"\")");
-            body.insertBegin(statement);
-        }
+
+            List<CtMethod> methodList = element.getElements(new TypeFilter<CtMethod>(CtMethod.class));
+            for (int i = 0; i < methodList.size(); i++) {
+                CtBlock body = methodList.get(i).getBody();
+                if(body!=null) {
+                    CtStatement statement = element.getFactory().Code().createCodeSnippetStatement("fr.inria.diversify.diversitype.MutationWatcher.setCurrentTest(\"" + element.getQualifiedName() + ":" + methodList.get(i).getSimpleName() + "\")");
+                    body.insertBegin(statement);
+                }
+            }
+
     }
 
 
