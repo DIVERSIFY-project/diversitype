@@ -43,6 +43,13 @@ public class SearchMojo extends AbstractMojo {
 
     /**
      * @parameter
+     * exression="${search.jarLocation}"
+     * @throws MojoExecutionException
+     */
+    private String jarLocation;
+
+    /**
+     * @parameter
      * expression="${search.mutationStrategy}"
      *  default-value="random"
      *  @throws MojoExecutionException
@@ -75,25 +82,27 @@ public class SearchMojo extends AbstractMojo {
     {
 
         try {
-            getLog().info(" * Search mojo - Execute with: " + projectDirectory);
+            if(!InitUtils.getAlreadyAnalyse()) {
+                getLog().info(" * Search mojo - Execute with: " + projectDirectory);
 
-            //initialization of tmpDir
-            InitUtils.init(projectDirectory, mutationStrategy, selectedCandidatesStratregy);
+                //initialization of tmpDir
+                InitUtils.init(projectDirectory, mutationStrategy, selectedCandidatesStratregy,jarLocation);
 
-            //create the project's hierarchy
-            if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {
-                getLog().info("inspect source code and generate the hierarchy");
-                UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+                //create the project's hierarchy
+                if (InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {
+                    getLog().info("inspect source code and generate the hierarchy");
+                    UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+                }
+
+                //treat given parameters and deduct the static type use during the mutation
+                finalInterfaces = getInterfaces();
+
+                //analyse source code
+                getLog().info("analyse the source code");
+                UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new StatisticsListProcessor(finalInterfaces), false);
+                LogWriter.printStatisticList();
+                InitUtils.setAlreadyAnalyse(true);
             }
-
-            //treat given parameters and deduct the static type use during the mutation
-            finalInterfaces=getInterfaces();
-
-            //analyse source code
-            getLog().info("analyse the code source");
-            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new StatisticsListProcessor(finalInterfaces), false);
-            LogWriter.printStatisticList();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

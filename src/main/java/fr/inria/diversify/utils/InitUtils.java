@@ -73,8 +73,12 @@ public class InitUtils {
      */
     private static CandidatesStrategy candidatesStrategy;
 
+    private static boolean alreadyAnalyse;
 
-    public static String init(String dirProject, String mutationStrat, String selectedCandidatesStratregy) throws IOException, InterruptedException {
+    private static String jarLocation;
+
+
+    public static String init(String dirProject, String mutationStrat, String selectedCandidatesStratregy, String jarLocat) throws IOException, InterruptedException {
         resolveDepedencies(dirProject);
 
         if(alreadyInit){
@@ -82,10 +86,13 @@ public class InitUtils {
             return tmpDirectory;
         }
 
+        alreadyAnalyse=false;
+
         mutationStrategy=getMutationStrategy(mutationStrat);
         candidatesStrategy=getCandidatesStrategy(selectedCandidatesStratregy);
 
         projectDirectory=dirProject;
+        jarLocation=jarLocat;
         outputDirectory=projectDirectory+ext;
         tmpDirectory = outputDirectory + "tmp_mutation/";
 
@@ -106,7 +113,7 @@ public class InitUtils {
         URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         try{
             //TODO get parameter for jar name
-            URL url = new File(getProjectDirectory()+"target/ProjA-1.0-SNAPSHOT.jar").toURI().toURL();
+            URL url = new File(jarLocation).toURI().toURL();
             Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class<?>[]{URL.class});
             addURL.setAccessible(true);
             addURL.invoke(systemClassLoader, new Object[]{url});
@@ -207,6 +214,10 @@ public class InitUtils {
         return candidatesStrategy;
     }
 
+    public static boolean getAlreadyAnalyse(){
+        return alreadyAnalyse;
+    }
+
     public static void deleteTmpDirectory() {
         File dir = new File(tmpDirectory);
         deleteRepository(dir);
@@ -223,6 +234,10 @@ public class InitUtils {
             }
         }
         r.delete();
+    }
+
+    public static void setAlreadyAnalyse(boolean alreadyAnalyse) {
+        InitUtils.alreadyAnalyse = alreadyAnalyse;
     }
 
     private static class TargetFileFilter implements FileFilter {

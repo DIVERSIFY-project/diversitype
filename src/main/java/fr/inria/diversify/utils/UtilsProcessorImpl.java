@@ -174,12 +174,13 @@ public class UtilsProcessorImpl {
      */
     private static List<String> getInterfacesForInternalStrategy(List<String> interf) {
         List<String> internalInterfaces= checkGivenInterf(interf);
-
         if(internalInterfaces.isEmpty()){
             //choose in the hierarchy, an interresting interface
             try {
-
-                internalInterfaces.add(selectInterfaceInHierarchy().get(0));
+                List<String> selectInterfaceInHierachy=selectInterfaceInHierarchy();
+                Random r = new Random();
+                int valeur =r.nextInt(selectInterfaceInHierachy.size());
+                internalInterfaces.add(selectInterfaceInHierarchy().get(valeur));
                 return internalInterfaces;
             } catch (NotInterfacesUsefullException e) {
                 //TODO better processing for this exception
