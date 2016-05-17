@@ -5,7 +5,5 @@ package fr.inria.diversify.mojo.mutation.transformation;
  */
 public interface Transformation {
 
-
-
     public void apply();
 }

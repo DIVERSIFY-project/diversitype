@@ -16,12 +16,18 @@ import java.util.jar.Attributes;
 
 
 /**
+ * THis class parse xml file and analyse it.
  * Created by guerin on 30/03/16.
  */
 public class XmlFileParser {
 
     private static boolean isPrinicipalProg;
 
+    /**
+     * Parse xml file and extract test results
+     * @param file
+     * @param isMainProg
+     */
     public static void treat(File file, boolean isMainProg) {
         XMLReader reader;
         TestFileHandler handler = new TestFileHandler();

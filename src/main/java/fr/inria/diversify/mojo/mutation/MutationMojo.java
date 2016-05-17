@@ -31,7 +31,9 @@ import java.util.List;
 
 /**
  * /**
- * Goal which inject diversity
+ *
+ *
+ * Goal which inject diversity.
  *
  * @goal mutation
  *
@@ -290,7 +292,7 @@ public class MutationMojo extends AbstractMojo{
         return body;
     }
 
-    public PrintWriter getPrintWriter() {
+    private PrintWriter getPrintWriter() {
         if(printWriter==null){
             try {
                 printWriter=new PrintWriter(InitUtils.getOutput()+"diversiType.txt");
@@ -301,7 +303,7 @@ public class MutationMojo extends AbstractMojo{
         return printWriter;
     }
 
-    public String getCommonTest(List<String> listTestCurrentT, List<String> testMainProject) {
+    private String getCommonTest(List<String> listTestCurrentT, List<String> testMainProject) {
         String commonTest="";
         for(int i=0;i<listTestCurrentT.size();i++){
             if(testMainProject.contains(listTestCurrentT.get(i))){

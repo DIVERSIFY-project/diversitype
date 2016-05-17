@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Implementation of the constructor call builder
  * Created by guerin on 10/05/16.
  */
 public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
@@ -193,7 +194,7 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
         }
     }
 
-    public Constructor getRandomConstructor() {
+    private Constructor getRandomConstructor() {
         Random r=new Random();
         int random = (int)(Math.random() * mutants.size());
         return mutants.get(random);

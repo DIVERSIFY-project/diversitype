@@ -15,6 +15,7 @@ import java.util.Random;
 /**
  * Created by lguerin on 12/08/15.
  */
+@Deprecated
 public class RandomConcreteTypeStrategy extends ChangeConcreteTypeStrategy {
     private List<String> concreteTypes=new ArrayList<>();
 

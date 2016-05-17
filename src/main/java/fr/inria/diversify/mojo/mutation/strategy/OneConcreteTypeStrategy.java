@@ -11,6 +11,7 @@ import java.util.*;
 /**
  * Created by lguerin on 10/08/15.
  */
+@Deprecated
 public class OneConcreteTypeStrategy extends ChangeConcreteTypeStrategy {
     private String newConcreteType;
 

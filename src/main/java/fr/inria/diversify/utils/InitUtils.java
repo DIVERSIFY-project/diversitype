@@ -73,11 +73,27 @@ public class InitUtils {
      */
     private static CandidatesStrategy candidatesStrategy;
 
+    /**
+     * Check if the project has already analyse by the statisticProcessor
+     */
     private static boolean alreadyAnalyse;
 
+    /**
+     * represent the path of the project's jar
+     */
     private static String jarLocation;
 
 
+    /**
+     * Initialization of project information
+     * @param dirProject
+     * @param mutationStrat
+     * @param selectedCandidatesStratregy
+     * @param jarLocat
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static String init(String dirProject, String mutationStrat, String selectedCandidatesStratregy, String jarLocat) throws IOException, InterruptedException {
         resolveDepedencies(dirProject);
 
@@ -87,10 +103,8 @@ public class InitUtils {
         }
 
         alreadyAnalyse=false;
-
         mutationStrategy=getMutationStrategy(mutationStrat);
         candidatesStrategy=getCandidatesStrategy(selectedCandidatesStratregy);
-
         projectDirectory=dirProject;
         jarLocation=jarLocat;
         outputDirectory=projectDirectory+ext;
@@ -100,15 +114,18 @@ public class InitUtils {
         dir.mkdirs();
         FileUtils.copyDirectory(new File(dirProject), dir, new TargetFileFilter());
 
-
         initPomTmp();
 
         loadJarProject();
 
         alreadyInit=true;
+
         return tmpDirectory;
     }
 
+    /**
+     * Add project's jar to the classPath
+     */
     private static void loadJarProject() {
         URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         try{
@@ -124,6 +141,10 @@ public class InitUtils {
     }
 
 
+    /**
+     * Resolve project's dependencies
+     * @param dirProject
+     */
     public static void resolveDepedencies(String dirProject){
         MavenDependencyResolver mavenDependencyResolver=new MavenDependencyResolver();
         try {
@@ -134,6 +155,10 @@ public class InitUtils {
         }
     }
 
+    /***
+     * Modification of the temporary pom.xml: delete the dependence to diversiType plugin
+     * avoid recursive calls to diversitype plugin
+     */
     private static void initPomTmp() {
 
         File pomFile=new File(tmpDirectory+"/pom.xml");

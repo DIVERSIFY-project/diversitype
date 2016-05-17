@@ -6,6 +6,7 @@ import spoon.reflect.declaration.CtElement;
 /**
  * Created by lguerin on 10/08/15.
  */
+@Deprecated
 public abstract class ChangeConcreteTypeStrategy {
 
     private  CtConstructorCall elementToModify;

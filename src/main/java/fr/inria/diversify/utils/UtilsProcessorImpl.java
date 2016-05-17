@@ -48,20 +48,28 @@ public class UtilsProcessorImpl {
      * possible ConstructorCall for the mutation
      */
     private static List<CtConstructorCall> candidates=new ArrayList<>();
+
+    /**
+     * selected constructor call for the mutation
+     */
     private static List<CtConstructorCall> selected=new ArrayList<>();
 
+    /**
+     * represent link between
+     */
     private static HashMap<String,List<String>> hierarchy=new HashMap<>();
 
-    private static String project="";
-    private static Factory factory;
 
     /**
      * List of static type for the mutation
      */
     private static List<String> interfaces=new ArrayList<>();
-    private static CandidatesSelectStrategy strategy;
 
 
+    /**
+     * Add possible point for the mutation
+     * @param ctConstructorCall
+     */
     public static void addCandidate(CtConstructorCall ctConstructorCall){
         candidates.add(ctConstructorCall);
     }
@@ -72,18 +80,10 @@ public class UtilsProcessorImpl {
      * @return
      */
     public static List<CtConstructorCall> getSelectedCandidates(int n){
-
-
-
         if(n>=candidates.size()){
             selected=candidates;
             return candidates;
         }
-
-        /*strategy=getStrategy();
-        strategy.init(n,candidates);
-        selected=strategy.getCandidates();*/
-
 
         Random r = new Random();
 
@@ -91,16 +91,21 @@ public class UtilsProcessorImpl {
             int valeur =r.nextInt(candidates.size());
             selected.add(candidates.get(valeur));
         }
-
         return selected;
     }
 
+    /**
+     * Launch a processor to the given project Directory
+     * if onlyTest equals true, processor is launch only on test source code
+     * Else, the processor is launch on source code only
+     * @param projectDirectory
+     * @param output
+     * @param processor
+     * @param onlyTest
+     * @return
+     */
     public static Factory spoonLauncher(String projectDirectory,String output,Processor processor,boolean onlyTest){
-
-
-        //InitUtils.setProject(projectDirectory);
         final SpoonAPI spoon = new Launcher();
-
         if(onlyTest) {
             spoon.addInputResource(projectDirectory + InitUtils.getTestDirectory());
         }else{
@@ -110,10 +115,13 @@ public class UtilsProcessorImpl {
         spoon.addProcessor(processor);
         spoon.run();
         return spoon.getFactory();
-
     }
 
-
+    /**
+     *For un constructor call, given in parameter, return its static type
+     * @param candidate
+     * @return
+     */
     public static Class getStaticType(CtConstructorCall candidate){
 
         CtTypeReference staticTypeTmp=null;
@@ -154,6 +162,11 @@ public class UtilsProcessorImpl {
     }
 
 
+    /**
+     * Add link between Interface and its subclass
+     * @param superClass
+     * @param subClass
+     */
     public static void addHierarchyLink(String superClass, String subClass) {
         if(hierarchy.containsKey(superClass)){
             if(!hierarchy.get(superClass).contains(subClass)) {
@@ -257,6 +270,7 @@ public class UtilsProcessorImpl {
         return interf;
     }
 
+    @Deprecated
     public static CandidatesSelectStrategy getStrategy() {
         switch(InitUtils.getCandidatesStrategy()){
             case internal:return new InternalTypeStrategy();
@@ -266,6 +280,11 @@ public class UtilsProcessorImpl {
 
     }
 
+    /**
+     * Check interfaces, given in parameter, et return selected interface according to selection strategy
+     * @param strings
+     * @return
+     */
     public static List<String> getInterfacesFromStrategy(List<String> strings) {
         interfaces=new ArrayList<>();
          if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){

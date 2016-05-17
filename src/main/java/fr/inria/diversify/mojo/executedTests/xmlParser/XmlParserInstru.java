@@ -10,12 +10,18 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
+ * This class scan the given repository and search test result of the plugin surefire.
  * Created by guerin on 31/03/16.
  */
 public class XmlParserInstru {
 
     private static boolean isMainProg;
 
+    /**
+     * Launch the analyse on the given repository
+     * @param testResultDirectory
+     * @param isPrincipalProject
+     */
     public static void start(String testResultDirectory, boolean isPrincipalProject) {
         File root=new File(testResultDirectory);
         Pattern name= Pattern.compile("(TEST-)(.)*(xml)");
@@ -25,7 +31,7 @@ public class XmlParserInstru {
 
     }
 
-    public static void findByFilter(File parent, Pattern filename) {
+    private static void findByFilter(File parent, Pattern filename) {
 
         if (parent.isDirectory()) {
             TestFileFilter filter = new TestFileFilter(filename);

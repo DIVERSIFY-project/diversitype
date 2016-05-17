@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Created by guerin on 02/05/16.
  */
+@Deprecated
 public class ExternalLibraryStrategy implements CandidatesSelectStrategy {
     private int nb=0;
     private List<CtConstructorCall> candidates=new ArrayList<>();

@@ -12,6 +12,7 @@ import spoon.reflect.visitor.filter.TypeFilter;
 import java.util.List;
 
 /**
+ * This processor add logger foreach test case (@Test)
  * Created by guerin on 12/04/16.
  */
 public class TestWatcherProcessor extends AbstractProcessor<CtClass>{

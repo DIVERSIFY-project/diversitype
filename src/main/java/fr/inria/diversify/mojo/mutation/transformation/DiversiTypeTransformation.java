@@ -72,6 +72,9 @@ public class DiversiTypeTransformation implements Transformation{
         ((CtStatement)parent).insertBefore(watcher);
     }
 
+    /**
+     * delete the mutation
+     */
     public void restore(){
         watcher.replace(null);
         newElement.replace(elementsToChange);
@@ -84,6 +87,11 @@ public class DiversiTypeTransformation implements Transformation{
 
     }
 
+    /**
+     * print java file for the current environment
+     * @param directory
+     * @throws IOException
+     */
     public void printJavaFile(String directory) throws IOException {
         CtType<?> type = getOriginalClass(elementsToChange);
         Factory factory = type.getFactory();

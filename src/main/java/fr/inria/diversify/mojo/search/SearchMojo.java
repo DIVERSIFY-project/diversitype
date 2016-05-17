@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Goal which create the analyse report
+ * Goal which create the analyse report and initialize project information
  *
  * @goal search
  * 
@@ -114,28 +114,9 @@ public class SearchMojo extends AbstractMojo {
     }
 
     private List<String> getInterfaces() {
-
         return UtilsProcessorImpl.getInterfacesFromStrategy(splitInterfaces());
-
-        /*if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
-            return getInterfacesForInternalStrategy();
-        }else if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)){
-            return getInterfacesForExternalStrategy();
-        }else{
-            //TODO
-            return new ArrayList<>();
-        }*/
     }
 
-    /*public List<String> getInterfacesForInternalStrategy() {
-
-        //return UtilsProcessorImpl.getInterfacesForInternalStrategy(splitInterfaces()) ;
-    }
-
-    public List<String> getInterfacesForExternalStrategy() {
-        //return UtilsProcessorImpl.getInterfacesForExternalStrategy(splitInterfaces());
-
-    }*/
 
     private List<String> splitInterfaces() {
         if(interfaces==null || interfaces.equals("")){
@@ -152,22 +133,5 @@ public class SearchMojo extends AbstractMojo {
 
     }
 
-    /*public void spoonLauncher(){
-
-        InitUtils.setProject(projectDirectory);
-        final SpoonAPI spoon = new Launcher();
-        spoon.addInputResource(projectDirectory + "/src/main/java/");
-        spoon.setSourceOutputDirectory(projectDirectory + outputDirectory);
-        spoon.addProcessor(new StatisticsListProcessor(interfaces));
-        spoon.run();
-
-        try {
-            LogWriter.printStatisticList();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-    }*/
 
 }

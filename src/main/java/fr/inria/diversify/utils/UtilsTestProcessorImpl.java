@@ -1,3 +1,4 @@
+
 package fr.inria.diversify.utils;
 
 
@@ -16,11 +17,23 @@ import java.util.List;
  */
 public class UtilsTestProcessorImpl {
 
+    /**
+     * Failed test of the main project
+     */
     private static List<String> testSuiteFail=new ArrayList<>();
 
+    /**
+     * faild test of the mutates project
+     */
     private static List<String> testSuiteFailCurrentT=new ArrayList<>();
 
-
+    /**
+     * add failed test for the main project
+     * @param testSuiteCurrent
+     * @param testCaseCurrent
+     * @param failure
+     * @param data
+     */
     public static void addTestFail(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
         if(!testSuiteFail.contains(testSuiteCurrent)){
             //TODO bien récuperer les informations necessaire
@@ -29,18 +42,28 @@ public class UtilsTestProcessorImpl {
         //System.out.println(testSuiteCurrent+" testCase: "+testCaseCurrent+" failure: "+failure+" data: "+data);
     }
 
+    /**
+     * return failed test of the main project
+     * @return
+     */
     public static List<String> getTestSuiteFail() {
         return testSuiteFail;
     }
 
+    /**
+     * clean failed test of the main project
+     */
     public static void clean() {
         testSuiteFail=new ArrayList<>();
 
     }
 
-
+    /**
+     * run tests in the given project repository
+     * maven goal "clean test" executed
+     * @param repo
+     */
     public static void runTest(String repo){
-        //lancement des tests
         AbstractBuilder builder= null;
         try {
             builder = new MavenBuilder(repo);
@@ -55,16 +78,30 @@ public class UtilsTestProcessorImpl {
         }
     }
 
+    /**
+     *add failed test for the mutated project
+     * @param testSuiteCurrent
+     * @param testCaseCurrent
+     * @param failure
+     * @param data
+     */
     public static void addTestFailMutation(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
         if(!testSuiteFailCurrentT.contains(testSuiteCurrent)){
             testSuiteFailCurrentT.add(testSuiteCurrent+":"+testCaseCurrent);
         }
     }
 
+    /**
+     * return failed test for the mutated project
+     * @return
+     */
     public static List<String> getTestSuiteFailCurrentT() {
         return testSuiteFailCurrentT;
     }
 
+    /**
+     * clean failed test for the mutated project
+     */
     public static void cleanTestFailMutation(){
         testSuiteFailCurrentT=new ArrayList<>();
     }

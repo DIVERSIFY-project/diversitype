@@ -11,10 +11,14 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
+ * This Processor analyse source code and foreach class,
+ * it add link between this class and its super class.
+ * Super class corresponding to interface implemented
  * Created by guerin on 02/05/16.
+ *
  */
 public class HierarchyProcessor extends AbstractProcessor<CtClass> {
-   
+
 
     @Override
     public void process(CtClass element) {

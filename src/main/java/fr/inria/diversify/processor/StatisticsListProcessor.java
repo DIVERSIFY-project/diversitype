@@ -18,7 +18,7 @@ import java.util.Set;
  * StatisticsListProcessor class
  * This processor analyse source code and create a report.
  * The report contains the number of possibles changes and where the diversity can be inject.
- *
+ * This processor initialize candidates into UtilsProcessor too.
  * Created by lguerin on 24/06/15.
  */
 public class StatisticsListProcessor extends spoon.processing.AbstractProcessor<CtClass> {
@@ -28,40 +28,12 @@ public class StatisticsListProcessor extends spoon.processing.AbstractProcessor<
 
     public StatisticsListProcessor(List<String> interfaces){
 
-        /*
-        String[] tab=interfaces.split(";");
-        for(int i=0;i<tab.length;i++){
-            this.interfaces.add(tab[i]);
-
-        }*/
         this.interfaces=interfaces;
         LogWriter.initialize(this.interfaces);
         ShutDownHookLogClassLoader shutdownHook = new ShutDownHookLogClassLoader();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
-       /* if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)) {
-            checkSubType();
-        }*/
 
     }
-
-    /**
-     * Check if interfaces given in parameter can be diversify
-     */
-   /* private void checkSubType() {
-        Reflections reflections = new Reflections(".*");
-        for(int i=0;i<interfaces.size();i++){
-            try {
-                Class current=Class.forName(interfaces.get(i));
-                Set<Class<?>> subtypes= reflections.getSubTypesOf(current);
-
-                if(subtypes.size()<2){
-                    LogWriter.isNotAPossibility(current);
-                }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
 
     @Override
     public void process(CtClass ctClass) {

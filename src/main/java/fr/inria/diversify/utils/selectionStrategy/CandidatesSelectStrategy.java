@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * Created by guerin on 02/05/16.
  */
+@Deprecated
 public interface CandidatesSelectStrategy {
 
     public void init(int nbCandidates, List<CtConstructorCall> candidates);
