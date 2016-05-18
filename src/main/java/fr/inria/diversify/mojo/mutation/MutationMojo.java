@@ -126,7 +126,7 @@ public class MutationMojo extends AbstractMojo{
                 constructorCallBuilder.setSelectionStrategy(InitUtils.getCandidatesStrategy());
 
                 CtConstructorCall newCtConstructorCall = constructorCallBuilder.findCtConstructorCall();
-
+                getLog().info("new ctConstructorCall: "+newCtConstructorCall);
 
                 DiversiTypeTransformation transformation = new DiversiTypeTransformation(selectedCandidates.get(i), InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), newCtConstructorCall);
                 transformation.apply();
@@ -141,7 +141,7 @@ public class MutationMojo extends AbstractMojo{
                 XmlParserInstru.start(InitUtils.getTmpDirectory(), false);
                 getLog().info("for mutation project: " + UtilsTestProcessorImpl.getTestSuiteFailCurrentT() + " failed !");
 
-
+                getLog().info("analyse results and print report");
                 //recupération de la couverture (resutlTestCaseTransfo.txt)
                 HashMap<String, List<String>> hashMap = analyseCoverageResult(InitUtils.getOutput());
 
@@ -152,6 +152,7 @@ public class MutationMojo extends AbstractMojo{
 
 
                 //restoration
+                getLog().info("project restoration");
                 transformation.restore();
             }catch (NoAlternativesException e){
                 getLog().info("there are not alternative for the current candidates");
