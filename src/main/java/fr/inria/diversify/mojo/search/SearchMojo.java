@@ -91,7 +91,11 @@ public class SearchMojo extends AbstractMojo {
                 //create the project's hierarchy
                 if (InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {
                     getLog().info("inspect source code and generate the hierarchy");
-                    UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+                    try {
+                        UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
 
                 //treat given parameters and deduct the static type use during the mutation

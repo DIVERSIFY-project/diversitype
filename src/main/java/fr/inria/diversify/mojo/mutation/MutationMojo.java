@@ -148,7 +148,7 @@ public class MutationMojo extends AbstractMojo{
                 //compare coverage and testFailed
                 List<String> list = compareResults(hashMap, UtilsTestProcessorImpl.getTestSuiteFailCurrentT(), selectedCandidates.get(i));
 
-                printResultTorCurrentTransfo(staticType, selectedCandidates.get(i), newCtConstructorCall, (hashMap == null), list, testFailMainProject);
+                printResultTorCurrentTransfo(staticType, selectedCandidates.get(i), newCtConstructorCall, (hashMap.isEmpty()), list, testFailMainProject);
 
 
                 //restoration
@@ -184,14 +184,15 @@ public class MutationMojo extends AbstractMojo{
         }else {
 
             List<String> coverageTests = hashMap.get(ctConstructorCall.getPosition().toString());
+            List<String> results=new ArrayList<>();
 
             for (int i = 0; i < coverageTests.size(); i++) {
-                if (!testSuiteFailCurrentT.contains(coverageTests.get(i))) {
-                    coverageTests.remove(coverageTests.get(i));
+                if (testSuiteFailCurrentT.contains(coverageTests.get(i))) {
+                    results.add(coverageTests.get(i));
                 }
             }
 
-            return coverageTests;
+            return results;
         }
     }
 
@@ -208,7 +209,9 @@ public class MutationMojo extends AbstractMojo{
                 String[] tab=current.split("::::");
                 if(results.containsKey(tab[1])){
                     List<String> tests=results.get(tab[1]);
-                    tests.add(tab[0]);
+                    if(!tests.contains(tab[0])) {
+                        tests.add(tab[0]);
+                    }
                 }else{
                     List<String> list=new ArrayList<>();
                     list.add(tab[0]);
@@ -223,7 +226,7 @@ public class MutationMojo extends AbstractMojo{
 
         } catch (FileNotFoundException e) {
            //Do something here -> the result is not print because the mutation is a field
-            return null;
+
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -283,7 +286,7 @@ public class MutationMojo extends AbstractMojo{
                 +"if(fileWriter==null){\n"
                 +"fileWriter=new FileWriter(\""+InitUtils.getOutput()+"resultTestCaseTransfo.txt\");\n"
                 +"}\n"
-                +"fileWriter.write(currentTest+\"::::\"+position);\n"
+                +"fileWriter.write(currentTest+\"::::\"+position+\"\\n\");\n"
                 +"fileWriter.flush();\n"
                 +"} catch (IOException e) {\n"
                 +"e.printStackTrace();\n"
