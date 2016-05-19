@@ -102,6 +102,8 @@ public class InitUtils {
             return tmpDirectory;
         }
 
+
+
         alreadyAnalyse=false;
         mutationStrategy=getMutationStrategy(mutationStrat);
         candidatesStrategy=getCandidatesStrategy(selectedCandidatesStratregy);
@@ -109,6 +111,8 @@ public class InitUtils {
         jarLocation=jarLocat;
         outputDirectory=projectDirectory+ext;
         tmpDirectory = outputDirectory + "tmp_mutation/";
+
+        cleanDiversitypeRepository();
 
         File dir = new File(tmpDirectory);
         dir.mkdirs();
@@ -121,6 +125,13 @@ public class InitUtils {
         alreadyInit=true;
 
         return tmpDirectory;
+    }
+
+    private static void cleanDiversitypeRepository() {
+        File dir=new File(outputDirectory);
+        if(dir!=null) {
+            deleteRepository(new File(outputDirectory));
+        }
     }
 
     /**
