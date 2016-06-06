@@ -102,7 +102,7 @@ public class SearchMojo extends AbstractMojo {
                 finalInterfaces = getInterfaces();
 
                 //analyse source code
-                getLog().info("analyse the source code");
+                getLog().info("analyse the source code for "+finalInterfaces);
                 UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new StatisticsListProcessor(finalInterfaces), false);
                 LogWriter.printStatisticList();
                 InitUtils.setAlreadyAnalyse(true);

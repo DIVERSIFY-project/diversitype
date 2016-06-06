@@ -90,10 +90,12 @@ public class MutationMojo extends AbstractMojo{
         testFailMainProject=UtilsTestProcessorImpl.getTestSuiteFail();
         getLog().info("for principal project: "+testFailMainProject+" failed !");
 
+        getLog().info("instrumentalize test suite");
         addWatcherClass();
 
         instrumentalizeTestSuite();
 
+        getLog().info("mutation...");
         doMutation();
 
         deleteTmpDirectory();
