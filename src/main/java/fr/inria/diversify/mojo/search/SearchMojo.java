@@ -30,12 +30,18 @@ import java.util.List;
  */
 public class SearchMojo extends AbstractMojo {
 
-
+    /**
+     * @parameter
+     * property="nchange"
+     * defaut-value=1
+     * @throws MojoExecutionException
+     */
+    private int nChange;
 
 
     /**
      * @parameter
-     *  expression="${search.project}"
+     *  property="project"
      *  default-value="/home/guerin/Documents/INRIA/ExProj/ProjA/"
      *  @throws MojoExecutionException
      */
@@ -43,14 +49,14 @@ public class SearchMojo extends AbstractMojo {
 
     /**
      * @parameter
-     * exression="${search.jarLocation}"
+     *  property="jarLocation"
      * @throws MojoExecutionException
      */
     private String jarLocation;
 
     /**
      * @parameter
-     * expression="${search.mutationStrategy}"
+     *  property="mutationStrategy"
      *  default-value="random"
      *  @throws MojoExecutionException
      */
@@ -58,15 +64,15 @@ public class SearchMojo extends AbstractMojo {
 
     /**
      * @parameter
-     * expression="${search.candidatesStrategy}"
+     *  property="candidateStrategy"
      *  default-value="internal"
      *  @throws MojoExecutionException
      */
-    private String selectedCandidatesStratregy;
+    private String candidateStratregy;
 
     /**
      *@parameter
-     *  expression="${search.interfaces}"
+     *   property="interfaces"
      * @throws MojoExecutionException
      */
     private String interfaces;
@@ -83,10 +89,10 @@ public class SearchMojo extends AbstractMojo {
 
         try {
             if(!InitUtils.getAlreadyAnalyse()) {
-                getLog().info(" * Search mojo - Execute with: " + projectDirectory);
+                getLog().info(" * Search mojo - Execute with: " + projectDirectory+mutationStrategy+candidateStratregy+jarLocation);
 
                 //initialization of tmpDir
-                InitUtils.init(projectDirectory, mutationStrategy, selectedCandidatesStratregy,jarLocation);
+                InitUtils.init(projectDirectory, mutationStrategy, candidateStratregy,jarLocation);
 
                 //create the project's hierarchy
                 if (InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {

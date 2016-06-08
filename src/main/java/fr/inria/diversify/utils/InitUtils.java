@@ -107,6 +107,7 @@ public class InitUtils {
         alreadyAnalyse=false;
         mutationStrategy=getMutationStrategy(mutationStrat);
         candidatesStrategy=getCandidatesStrategy(selectedCandidatesStratregy);
+
         projectDirectory=dirProject;
         jarLocation=jarLocat;
         outputDirectory=projectDirectory+ext;
@@ -128,8 +129,10 @@ public class InitUtils {
     }
 
     private static void cleanDiversitypeRepository() {
+
         File dir=new File(outputDirectory);
-        if(dir!=null) {
+
+        if(dir!=null && dir.exists()) {
             deleteRepository(new File(outputDirectory));
         }
     }
@@ -185,8 +188,6 @@ public class InitUtils {
             Writer fileWriter= WriterFactory.newXmlWriter(pomFile);
             mavenXpp3Writer.write(fileWriter, model);
             IOUtil.close(fileWriter);
-
-            System.out.print("");
 
 
         } catch (IOException e) {

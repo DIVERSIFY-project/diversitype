@@ -49,7 +49,7 @@ public class MutationMojo extends AbstractMojo{
 
     /**
      * @parameter
-     * expression=${mutation.nchange}}
+     *  property="nchange"
      * defaut-value=1
      * @throws MojoExecutionException
      */
@@ -57,7 +57,7 @@ public class MutationMojo extends AbstractMojo{
 
     /**
      * @parameter
-     *  expression="${mutation.project}"
+     *  property="mutation.project"
      *  default-value="/home/guerin/Documents/INRIA/ExProj/ProjA/"
      *  @throws MojoExecutionException
      */
@@ -65,7 +65,7 @@ public class MutationMojo extends AbstractMojo{
 
     /**
      *@parameter
-     *  expression="${mutation.interfaces}"
+     *   property="mutation.interfaces"
      *  default-value="java.util.List"
      * @throws MojoExecutionException
      */
