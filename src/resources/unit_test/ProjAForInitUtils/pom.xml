@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>fr.inria.diversify</groupId>
+  <artifactId>ProjA</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>unit_test.ProjA</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.6.1</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+
+        <groupId>fr.inria.diversify</groupId>
+        <artifactId>DiversiType</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <projectDirectory>${basedir}/src/resources/unit_test/ProjA/</projectDirectory>
+          <jarLocation>${basedir}/src/resources/unit_test.ProjA/target/unit_test/ProjA-1.0-SNAPSHOT.jar</jarLocation>
+          <nChange>1</nChange>
+          <candidateStratregy>internal</candidateStratregy>
+          <mutationStrategy>random</mutationStrategy>
+        </configuration>
+        <executions>
+          <execution>
+            <id>search execution</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>search</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>mutation exectution</id>
+            <phase>test</phase>
+            <goals>
+              <goal>mutation</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+
+</project>
