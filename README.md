@@ -17,7 +17,7 @@ projectDirectory
 ```
 
 ### 2- This plugin need the path to your jar project.
-So, after to use it, launch the maven command:
+So, before to use it, launch the maven command:
 ```
 mvn package
 ```
