@@ -4,6 +4,7 @@ import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
 public class XmlParserInstru {
 
     private static boolean isMainProg;
+    private static List<File> children;
 
     /**
      * Launch the analyse on the given repository
@@ -26,6 +28,7 @@ public class XmlParserInstru {
         File root=new File(testResultDirectory);
         Pattern name= Pattern.compile("(TEST-)(.)*(xml)");
         isMainProg=isPrincipalProject;
+        children=new ArrayList<>();
 
         findByFilter(root, name);
 
@@ -35,7 +38,7 @@ public class XmlParserInstru {
 
         if (parent.isDirectory()) {
             TestFileFilter filter = new TestFileFilter(filename);
-            List<File> children = Arrays.asList(parent.listFiles(filter));
+            children = Arrays.asList(parent.listFiles(filter));
             if (children.size() > 0) {
                 for(int i=0;i<children.size();i++){
                     if(children.get(i).length()!=0) {
@@ -72,5 +75,13 @@ public class XmlParserInstru {
             return (pattern.matcher(pathname.getName()).matches());
         }
 
+    }
+
+    public static boolean isMainProg() {
+        return isMainProg;
+    }
+
+    public static List<File> getChildren() {
+        return children;
     }
 }
