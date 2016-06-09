@@ -38,4 +38,9 @@ public class ExecutedTestsMojo extends AbstractMojo {
         projectDirectory= InitUtils.getProjectDirectory();
         testResultDirectory=projectDirectory+"/target/surefire-reports/";
     }
+
+    public void setProjectDirectory(String s){
+        projectDirectory=s;
+        testResultDirectory=projectDirectory+"/target/surefire-reports/";
+    }
 }

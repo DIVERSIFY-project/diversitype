@@ -42,7 +42,7 @@ public class SearchMojo extends AbstractMojo {
     /**
      * @parameter
      *  property="project"
-     *  default-value="/home/guerin/Documents/INRIA/ExProj/ProjA/"
+     *  default-value="/home/guerin/Documents/INRIA/ExProj/unit_test.ProjA/"
      *  @throws MojoExecutionException
      */
     private String projectDirectory;

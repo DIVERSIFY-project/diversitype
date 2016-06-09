@@ -58,7 +58,7 @@ public class MutationMojo extends AbstractMojo{
     /**
      * @parameter
      *  property="mutation.project"
-     *  default-value="/home/guerin/Documents/INRIA/ExProj/ProjA/"
+     *  default-value="/home/guerin/Documents/INRIA/ExProj/unit_test.ProjA/"
      *  @throws MojoExecutionException
      */
     private String projectDirectory;
@@ -70,6 +70,29 @@ public class MutationMojo extends AbstractMojo{
      * @throws MojoExecutionException
      */
     private String interfaces;
+
+    /**
+     * @parameter
+     *  property="jarLocation"
+     * @throws MojoExecutionException
+     */
+    private String jarLocation;
+
+    /**
+     * @parameter
+     *  property="mutationStrategy"
+     *  default-value="random"
+     *  @throws MojoExecutionException
+     */
+    private String mutationStrategy;
+
+    /**
+     * @parameter
+     *  property="candidateStrategy"
+     *  default-value="internal"
+     *  @throws MojoExecutionException
+     */
+    private String candidateStratregy;
 
     /**
      * this attribute contains failed test before mutation

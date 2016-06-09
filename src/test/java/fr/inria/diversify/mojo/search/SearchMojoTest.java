@@ -1,5 +1,8 @@
 package fr.inria.diversify.mojo.search;
 
+import fr.inria.diversify.utils.InitUtils;
+import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -11,6 +14,7 @@ import org.junit.Test;
 import org.junit.Rule;
 import java.io.File;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -22,7 +26,7 @@ public class SearchMojoTest {
 
     private static File pom;
 
-    private final String outputDirectory="src/resources/ProjA/target/diversiType/";
+    private final String outputDirectory="src/resources/unit_test/ProjA/target/diversiType/";
 
     private final String tmpDirectory="tmp_mutation/";
 
@@ -34,7 +38,7 @@ public class SearchMojoTest {
 
     @BeforeClass
     public static void initPom(){
-        pom =  new File("src/resources/ProjA/pom.xml");
+        pom =  new File("src/resources/unit_test/ProjA/pom.xml");
     }
 
 
@@ -117,8 +121,33 @@ public class SearchMojoTest {
                fail("DiversiType dependencies is not removed");
             }
         }
-
     }
+
+    @Test
+    public void testInitIsCall() throws Exception {
+        SearchMojo myMojo = (SearchMojo) rule.lookupMojo( "search", pom );
+        assertNotNull(myMojo);
+        myMojo.execute();
+
+        assertTrue(InitUtils.getAlreadyAnalyse());
+    }
+
+    @Test
+    public void testHierarchyIsInitialize() throws Exception {
+        SearchMojo myMojo = (SearchMojo) rule.lookupMojo( "search", pom );
+        assertNotNull(myMojo);
+        myMojo.execute();
+
+        HashMap<String,List<String>> hashMap= UtilsProcessorImpl.getHierarchy();
+
+        if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
+            assertTrue(!hashMap.isEmpty());
+        }else{
+            assertTrue(hashMap.isEmpty());
+        }
+    }
+
+
 
 
 }
