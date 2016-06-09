@@ -132,6 +132,7 @@ For the moment, the number of mutation for test phase is limited to 1 chane.
 + Give the possibility to do more change ( >1)
 + Improve the interface selection algorithm
 + Choose precisely the interface to mutate
++ Become less dependant to maven project structure
 + Improve the result analyse (why the test fail with the mutation)
 
 
