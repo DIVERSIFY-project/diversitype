@@ -48,8 +48,8 @@
         <artifactId>DiversiType</artifactId>
         <version>1.0-SNAPSHOT</version>
         <configuration>
-          <projectDirectory>${basedir}/src/resources/unit_test/ProjA/</projectDirectory>
-          <jarLocation>${basedir}/src/resources/unit_test.ProjA/target/unit_test/ProjA-1.0-SNAPSHOT.jar</jarLocation>
+          <projectDirectory>${basedir}/src/resources/unit_test/ProjAForInitUtils/</projectDirectory>
+          <jarLocation>${basedir}/src/resources/unit_test/ProjAForInitUtils/target/ProjA-1.0-SNAPSHOT.jar</jarLocation>
           <nChange>1</nChange>
           <candidateStratregy>internal</candidateStratregy>
           <mutationStrategy>random</mutationStrategy>

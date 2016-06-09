@@ -41,7 +41,7 @@ public class InitUtils {
     /**
      * Test directory
      */
-    private static String testDir="src/test/java";
+    private static String testDir="src/test/java/";
 
     /**
      * tmpDirectory contains sosies during plugin's process
@@ -101,8 +101,6 @@ public class InitUtils {
 
             return tmpDirectory;
         }
-
-
 
         alreadyAnalyse=false;
         mutationStrategy=getMutationStrategy(mutationStrat);
@@ -253,6 +251,10 @@ public class InitUtils {
 
     public static boolean getAlreadyAnalyse(){
         return alreadyAnalyse;
+    }
+
+    public static void setAlreadyInit(boolean alreadyInit) {
+        InitUtils.alreadyInit = alreadyInit;
     }
 
     public static void deleteTmpDirectory() {
