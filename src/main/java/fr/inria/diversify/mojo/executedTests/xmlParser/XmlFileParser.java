@@ -25,7 +25,7 @@ public class XmlFileParser {
 
     /**
      * Parse xml file and extract test results
-     * @param file
+     * @param file: TEST-*.xml file generate by surefire:test
      * @param isMainProg
      */
     public static void treat(File file, boolean isMainProg) {
@@ -47,7 +47,7 @@ public class XmlFileParser {
                 reader.setContentHandler(handler);
                 reader.parse(file.getAbsolutePath());
             }catch (Exception e2){
-                System.out.println("exception: " + e2);
+                e2.printStackTrace();
             }
         }
 
