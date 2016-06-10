@@ -22,7 +22,7 @@ So, before to use it, launch the maven command:
 mvn package
 ```
 
-### 3-Your project should be have dependency to surefire plugin
+### 3-Your project should have dependency to surefire plugin
 Add this dependency to your pom.xml:
 ```
  <plugin>

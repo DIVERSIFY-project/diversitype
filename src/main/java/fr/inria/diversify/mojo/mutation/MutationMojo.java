@@ -33,7 +33,9 @@ import java.util.List;
  * /**
  *
  *
- * Goal which inject diversity.
+ * This goal create diversity on the project.
+ * It instrumentalize test suite, change the mutation point,
+ * execute test suite and analyse results.
  *
  * @goal mutation
  *

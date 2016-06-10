@@ -12,7 +12,8 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * Created by guerin on 30/03/16.
  *
- *  this mojo analyse test results of the main project
+ * this mojo analyse test results of the main project
+ * and store failed test
  *
  * @goal analysetests
  *

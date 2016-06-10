@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Goal which create the analyse report and initialize project information
+ * This goal create the analyse report and initialize project information.
  *
  * @goal search
  * 
