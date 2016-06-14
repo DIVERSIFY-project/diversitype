@@ -58,6 +58,13 @@ public class InitUtils {
      */
     private static String ext="target/diversiType/";
 
+    private static String learningExt="target/diversiType_learning/";
+
+    /**
+     * directory contain the learned information during plugin execution
+     */
+    private static String learningDirectory;
+
     /**
      * boolean for init the static class only once
      */
@@ -82,6 +89,8 @@ public class InitUtils {
      * represent the path of the project's jar
      */
     private static String jarLocation;
+
+
 
 
     /**
@@ -110,8 +119,10 @@ public class InitUtils {
         jarLocation=jarLocat;
         outputDirectory=projectDirectory+ext;
         tmpDirectory = outputDirectory + "tmp_mutation/";
+        learningDirectory=projectDirectory+learningExt;
 
         cleanDiversitypeRepository();
+        addLearningRepository();
 
         File dir = new File(tmpDirectory);
         dir.mkdirs();
@@ -124,6 +135,14 @@ public class InitUtils {
         alreadyInit=true;
 
         return tmpDirectory;
+    }
+
+    private static void addLearningRepository() {
+        File dir = new File(learningDirectory);
+        if(dir !=null && !dir.exists()) {
+            dir.mkdirs();
+        }
+
     }
 
     private static void cleanDiversitypeRepository() {
@@ -247,6 +266,10 @@ public class InitUtils {
 
     public static CandidatesStrategy getCandidatesStrategy(){
         return candidatesStrategy;
+    }
+
+    public static String getLearningDirectory() {
+        return learningDirectory;
     }
 
     public static boolean getAlreadyAnalyse(){

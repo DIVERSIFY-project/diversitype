@@ -4,7 +4,7 @@
 Randomly diversifies types of polymorphic variables in application code when running a test suite
 
 ## Prerequisites
-For use this plugin,
+To use this plugin,
 
 ### 1- Your project should use the standard maven structure:
 
@@ -22,7 +22,7 @@ So, before to use it, launch the maven command:
 mvn package
 ```
 
-### 3-Your project should have dependency to surefire plugin
+### 3-Your project should have dependency to the surefire plugin
 Add this dependency to your pom.xml:
 ```
  <plugin>
@@ -71,7 +71,7 @@ Maybe your tests will failed during the mutation ;)
 ```
 You should add, on the configuration:
 + the project directory,
-+ the jar location of your project
++ Your project's jar location
 + the number of change you would like.
 
 ### 2- Launch Tests !
@@ -79,22 +79,22 @@ Use the command:
 ```
 mvn clean test
 ```
-and hope the best!
+and hope for the best!
 
 ### 3- Check reports
 DiversiType plugin generate two report in the directory {your_project_directory}/target/diversitype
 
 **3.1- diversitype.txt**
 
-This report indicate the made mutation:
+This report indicate the mutations made: (ex: for the mutation, List l=new ArrayList() --> List l=new LinkedList())
 + The analysed interface (ex: java.util.List)
-+ The mutation point ( ex:{path_to_the_mutation_point}:List l= new ArrayList())
-+ The concrete type was changed ( ex: java.util.ArrayList)
-+ The type which has replace the concrete type (ex: java.util.LinkedList)
++ The mutation point ( ex:{path_to_the_mutation_point}: new ArrayList())
++ The concrete type that was changed ( ex: java.util.ArrayList)
++ The replacement of the concrete type (ex: java.util.LinkedList)
 
 It indicate the test results too:
-+ Tests have failed for the the project before mutation
-+ Failed tests added after mutation
++ The failed tests before the project's mutation
++ Failed tests added by mutation
 + Failed tests in common between project before and after the mutation.
 + Failed tests resolved by the mutation
 
@@ -114,13 +114,13 @@ It indicate:
 
 The selection strategy is "internal". Which means that the plugin will analyse the source code of your project
 and record the hierarchy of your classes.
-So, the mutation will be on your interface.
+So, the mutation will be on your interfaces.
 
-The mutation strategy is "random". The plugin find all possible constructor calls for the mutation and take on randomly.
+The mutation strategy is "random". The plugin find all possible constructor calls for the mutation and take one randomly.
 
 2. The nchange is fix to 1
 
-For the moment, the number of mutation for test phase is limited to 1 chane.
+For the moment, the number of mutation for test phase is limited to 1 change.
 
 ### Version 1.1
 
@@ -134,6 +134,7 @@ For the moment, the number of mutation for test phase is limited to 1 chane.
 + Choose precisely the interface to mutate
 + Become less dependant to maven project structure
 + Improve the result analyse (why the test fail with the mutation)
++ Add the plugin to maven central
 
 
 

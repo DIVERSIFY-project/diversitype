@@ -2,6 +2,7 @@ package fr.inria.diversify.mojo.search;
 
 
 
+import fr.inria.diversify.exceptions.NotInterfacesUsefullException;
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.processor.HierarchyProcessor;
 import fr.inria.diversify.processor.StatisticsListProcessor;
@@ -119,11 +120,13 @@ public class SearchMojo extends AbstractMojo {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NotInterfacesUsefullException e) {
+            getLog().info("There aren't interface with possibility of mutation");
         }
 
     }
 
-    private List<String> getInterfaces() {
+    private List<String> getInterfaces() throws NotInterfacesUsefullException {
         return UtilsProcessorImpl.getInterfacesFromStrategy(splitInterfaces());
     }
 

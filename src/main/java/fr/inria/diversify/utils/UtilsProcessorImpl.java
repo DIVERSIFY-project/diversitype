@@ -1,6 +1,7 @@
 package fr.inria.diversify.utils;
 
 import fr.inria.diversify.exceptions.NotInterfacesUsefullException;
+import fr.inria.diversify.learning.UtilsLearning;
 import fr.inria.diversify.logger.LogWriter;
 import fr.inria.diversify.processor.StatisticsListProcessor;
 import fr.inria.diversify.utils.selectionStrategy.CandidatesSelectStrategy;
@@ -33,6 +34,7 @@ import spoon.support.reflect.code.CtLocalVariableImpl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -80,8 +82,12 @@ public class UtilsProcessorImpl {
      * @return
      */
     public static List<CtConstructorCall> getSelectedCandidates(int n){
-        if(n>=candidates.size()){
-            selected=candidates;
+
+        compareWithLearning();
+
+
+        if(n>=candidates.size()) {
+            selected = candidates;
             return candidates;
         }
 
@@ -92,6 +98,21 @@ public class UtilsProcessorImpl {
             selected.add(candidates.get(valeur));
         }
         return selected;
+    }
+
+    private static void compareWithLearning() {
+        List<String> learning=new ArrayList<>();
+        try {
+            learning =UtilsLearning.readConstructorCallLearning();
+        } catch (IOException e) {
+
+        }
+
+        for(int i=0;i<candidates.size();i++){
+            if(learning.contains(candidates.get(i).toString())){
+                candidates.remove(candidates.get(i));
+            }
+        }
     }
 
     /**
@@ -185,22 +206,17 @@ public class UtilsProcessorImpl {
      * @param interf
      * @return
      */
-    private static List<String> getInterfacesForInternalStrategy(List<String> interf) {
+    private static List<String> getInterfacesForInternalStrategy(List<String> interf) throws NotInterfacesUsefullException {
         List<String> internalInterfaces= checkGivenInterf(interf);
         if(internalInterfaces.isEmpty()){
             //choose in the hierarchy, an interresting interface
-            try {
+
                 List<String> selectInterfaceInHierachy=selectInterfaceInHierarchy();
                 Random r = new Random();
                 int valeur =r.nextInt(selectInterfaceInHierachy.size());
                 internalInterfaces.add(selectInterfaceInHierarchy().get(valeur));
                 return internalInterfaces;
-            } catch (NotInterfacesUsefullException e) {
-                //TODO better processing for this exception
-                e.printStackTrace();
-                System.exit(0);
-                return null;
-            }
+
         }else{
            return internalInterfaces;
         }
@@ -208,13 +224,21 @@ public class UtilsProcessorImpl {
     }
 
     private static List<String> selectInterfaceInHierarchy() throws NotInterfacesUsefullException {
+
+        //TODO LEARN: comparer avec le fichier d'apprentissage
+        List<String> learning=new ArrayList<>();
+        try {
+            learning= UtilsLearning.readInterfacesLearning();
+        } catch (IOException e) {
+
+        }
         List<String> result=new ArrayList<>();
 
         Set<String> keys=hierarchy.keySet();
         Iterator<String> it=keys.iterator();
         while(it.hasNext()){
             String current=it.next();
-            if(hierarchy.get(current).size()>1){
+            if(hierarchy.get(current).size()>1 && !learning.contains(current)){
                 result.add(current);
             }
         }
@@ -285,13 +309,16 @@ public class UtilsProcessorImpl {
      * @param strings
      * @return
      */
-    public static List<String> getInterfacesFromStrategy(List<String> strings) {
+    public static List<String> getInterfacesFromStrategy(List<String> strings) throws NotInterfacesUsefullException {
         interfaces=new ArrayList<>();
          if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
             interfaces= getInterfacesForInternalStrategy(strings);
         }else if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)){
             interfaces= getInterfacesForExternalStrategy(strings);
         }
+
+
+
         return interfaces;
     }
 
@@ -299,5 +326,7 @@ public class UtilsProcessorImpl {
         return hierarchy;
     }
 
-
+    public static List<String> getInterfaces() {
+        return interfaces;
+    }
 }

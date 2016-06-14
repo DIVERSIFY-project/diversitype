@@ -1,6 +1,7 @@
 package fr.inria.diversify.mojo.mutation;
 
 import fr.inria.diversify.exceptions.NoAlternativesException;
+import fr.inria.diversify.learning.UtilsLearning;
 import fr.inria.diversify.mojo.executedTests.xmlParser.XmlParserInstru;
 import fr.inria.diversify.mojo.mutation.builder.ConstructorCallBuilder;
 import fr.inria.diversify.mojo.mutation.builder.ConstructorCallBuilderWithStrategy;
@@ -138,6 +139,11 @@ public class MutationMojo extends AbstractMojo{
         selectedCandidates=UtilsProcessorImpl.getSelectedCandidates(nChange);
         ConstructorCallBuilder constructorCallBuilder=new ConstructorCallBuilderWithStrategy();
 
+        if(selectedCandidates.size()==0){
+            getLog().info("For selected interfaces, there aren't mutation point: Interface i= new Impl()");
+            addLearningInterfaces(UtilsProcessorImpl.getInterfaces());
+        }
+
         for(int i=0;i<selectedCandidates.size();i++){
 
             try {
@@ -183,11 +189,17 @@ public class MutationMojo extends AbstractMojo{
                 transformation.restore();
             }catch (NoAlternativesException e){
                 getLog().info("there are not alternative for the current candidates");
+                getLog().info("add "+selectedCandidates.get(i)+" to learning files");
+                UtilsLearning.addConstructorCall(selectedCandidates.get(i).toString());
             }
         }
 
         getPrintWriter().close();
 
+    }
+
+    private void addLearningInterfaces(List<String> interfaces) {
+        UtilsLearning.addInterface(interfaces);
     }
 
     private void printResultTorCurrentTransfo(String staticType, CtConstructorCall ctConstructorCall, CtConstructorCall newCtConstructorCall, boolean coverageIsNull, List<String> listTestCurrentT, List<String> testMainProject) {
