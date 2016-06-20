@@ -4,7 +4,6 @@ import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtClass;
-import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
 import java.util.Iterator;
@@ -29,7 +28,14 @@ public class HierarchyProcessor extends AbstractProcessor<CtClass> {
 
         while(iterator.hasNext()){
             CtTypeReference current=iterator.next();
-            if(current.getPosition().toString().contains(InitUtils.getProjectDirectory())){
+            String pack;
+            if(current.getPackage()==null){
+                pack=current.getDeclaringType().getPackage().getSimpleName();
+            }else{
+                pack=current.getPackage().getSimpleName();
+            }
+
+            if(pack.contains(InitUtils.getGroupId())){
                 UtilsProcessorImpl.addHierarchyLink(current.getQualifiedName(),element.getQualifiedName());
             }
         }

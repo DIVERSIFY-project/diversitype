@@ -122,6 +122,12 @@ public class SearchMojo extends AbstractMojo {
             e.printStackTrace();
         } catch (NotInterfacesUsefullException e) {
             getLog().info("There aren't interface with possibility of mutation");
+            try {
+                LogWriter.printStatisticList();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+            InitUtils.setAlreadyAnalyse(true);
         }
 
     }

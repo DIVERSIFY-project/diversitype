@@ -90,6 +90,11 @@ public class InitUtils {
      */
     private static String jarLocation;
 
+    /**
+     * ArtefactId of the project
+     */
+    private static String groupId;
+
 
 
 
@@ -199,6 +204,7 @@ public class InitUtils {
             MavenXpp3Reader xpp3=new MavenXpp3Reader();
 
             Model model=xpp3.read(reader);
+            groupId=model.getGroupId();
             checkPlugins(model);
 
             MavenXpp3Writer mavenXpp3Writer = new MavenXpp3Writer();
@@ -213,6 +219,8 @@ public class InitUtils {
             e.printStackTrace();
         }
     }
+
+
 
     private static void checkPlugins(Model model) {
         List<Plugin> pluginList= model.getBuild().getPlugins();
@@ -278,6 +286,10 @@ public class InitUtils {
 
     public static void setAlreadyInit(boolean alreadyInit) {
         InitUtils.alreadyInit = alreadyInit;
+    }
+
+    public static String getGroupId() {
+        return groupId;
     }
 
     public static void deleteTmpDirectory() {

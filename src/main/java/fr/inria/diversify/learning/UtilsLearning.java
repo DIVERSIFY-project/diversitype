@@ -33,18 +33,19 @@ public class UtilsLearning {
             PrintWriter writer=getInterfaceFileWriter();
             writer.write(interfaceLearning+"\n");
 
-        } catch (FileNotFoundException e) {
 
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public static void addConstructorCall(String constructoCallLearning){
         try {
-            PrintWriter writer=getConstructorFileWriter();
-            writer.write(constructoCallLearning+"\n");
+            PrintWriter writer = getConstructorFileWriter();
+            writer.write(constructoCallLearning + "\n");
 
-        } catch (FileNotFoundException e) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -82,20 +83,20 @@ public class UtilsLearning {
         return constructorCall;
     }
 
-    private static PrintWriter getInterfaceFileWriter() throws FileNotFoundException {
+    private static PrintWriter getInterfaceFileWriter() throws IOException {
         if(interfacefileWriter==null){
             InterfaceShutdownHookLog shutdownHook = new InterfaceShutdownHookLog();
             Runtime.getRuntime().addShutdownHook(shutdownHook);
-            interfacefileWriter=new PrintWriter(new File(InitUtils.getLearningDirectory()+interfaceLearning));
+            interfacefileWriter=new PrintWriter(new BufferedWriter(new FileWriter(InitUtils.getLearningDirectory()+interfaceLearning, true)));
         }
         return interfacefileWriter;
     }
 
-    private static PrintWriter getConstructorFileWriter() throws FileNotFoundException {
+    private static PrintWriter getConstructorFileWriter() throws IOException {
         if(constructorfileWriter==null){
             ConstructorShutdownHookLog shutdownHook = new ConstructorShutdownHookLog();
             Runtime.getRuntime().addShutdownHook(shutdownHook);
-            constructorfileWriter=new PrintWriter(new File(InitUtils.getLearningDirectory()+constructorCallLearning));
+            constructorfileWriter=new PrintWriter(new BufferedWriter(new FileWriter(InitUtils.getLearningDirectory()+constructorCallLearning, true)));
         }
         return constructorfileWriter;
     }

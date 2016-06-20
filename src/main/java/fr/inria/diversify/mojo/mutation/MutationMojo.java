@@ -121,12 +121,18 @@ public class MutationMojo extends AbstractMojo{
 
         instrumentalizeTestSuite();
 
+        printHierarchy();
+
         getLog().info("mutation...");
         doMutation();
 
         deleteTmpDirectory();
 
         //printOutResult
+    }
+
+    private void printHierarchy() {
+        UtilsProcessorImpl.printHierarchy();
     }
 
     private void deleteTmpDirectory() {
@@ -190,7 +196,7 @@ public class MutationMojo extends AbstractMojo{
             }catch (NoAlternativesException e){
                 getLog().info("there are not alternative for the current candidates");
                 getLog().info("add "+selectedCandidates.get(i)+" to learning files");
-                UtilsLearning.addConstructorCall(selectedCandidates.get(i).toString());
+                UtilsLearning.addConstructorCall(selectedCandidates.get(i).getPosition().toString());
             }
         }
 

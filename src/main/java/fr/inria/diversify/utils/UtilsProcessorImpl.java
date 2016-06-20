@@ -35,6 +35,7 @@ import spoon.support.reflect.code.CtLocalVariableImpl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -109,7 +110,7 @@ public class UtilsProcessorImpl {
         }
 
         for(int i=0;i<candidates.size();i++){
-            if(learning.contains(candidates.get(i).toString())){
+            if(learning.contains(candidates.get(i).getPosition().toString())){
                 candidates.remove(candidates.get(i));
             }
         }
@@ -328,5 +329,22 @@ public class UtilsProcessorImpl {
 
     public static List<String> getInterfaces() {
         return interfaces;
+    }
+
+    public static void printHierarchy() {
+        try {
+            PrintWriter printWriter=new PrintWriter(InitUtils.getOutput()+"hierarchy.txt");
+            Set<String> set=hierarchy.keySet();
+            Iterator<String> it=set.iterator();
+            while (it.hasNext()){
+                String current=it.next();
+                List<String> list=hierarchy.get(current);
+                printWriter.write(current+" : "+list+"\n");
+            }
+            printWriter.close();
+        } catch (FileNotFoundException e) {
+
+        }
+
     }
 }
