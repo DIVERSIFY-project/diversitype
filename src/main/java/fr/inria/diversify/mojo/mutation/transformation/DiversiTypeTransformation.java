@@ -67,9 +67,15 @@ public class DiversiTypeTransformation implements Transformation{
             parent=parent.getParent();
         }
 
-        //TODO add createCodeSnippet
+
         watcher=parent.getFactory().Code().createCodeSnippetStatement("fr.inria.diversify.diversitype.MutationWatcher.setCurrentTransfo(\""+elementsToChange.getPosition().toString()+"\")");
-        ((CtStatement)parent).insertBefore(watcher);
+
+        CtStatement statement=((CtStatement) parent);
+        if(statement.toString().startsWith("this(") || statement.toString().startsWith("super(")){
+            statement.insertAfter(watcher);
+        }else{
+            statement.insertBefore(watcher);
+        }
     }
 
     /**
