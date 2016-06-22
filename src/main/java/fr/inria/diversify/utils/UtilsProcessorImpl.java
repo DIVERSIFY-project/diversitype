@@ -58,9 +58,28 @@ public class UtilsProcessorImpl {
     private static List<CtConstructorCall> selected=new ArrayList<>();
 
     /**
-     * represent link between
+     * represent link between interfaces and all possibility
      */
     private static HashMap<String,List<String>> hierarchy=new HashMap<>();
+
+
+
+    /**
+     * represent link between interface and concrete type (lvl 1)
+     */
+    private static HashMap<String,List<String>> interfaceChildren=new HashMap<>();
+
+    /**
+     *represent link between abstract class and concrete type (lvl 1)
+     */
+    private static List<String> abstractClass=new ArrayList<>();
+
+    /**
+     * represent link between class and his children (lvl1)
+     */
+    private static HashMap<String,List<String>> classChildren=new HashMap<>();
+
+
 
 
     /**
@@ -184,23 +203,7 @@ public class UtilsProcessorImpl {
     }
 
 
-    /**
-     * Add link between Interface and its subclass
-     * @param superClass
-     * @param subClass
-     */
-    public static void addHierarchyLink(String superClass, String subClass) {
-        if(hierarchy.containsKey(superClass)){
-            if(!hierarchy.get(superClass).contains(subClass)) {
-                hierarchy.get(superClass).add(subClass);
-            }
-        }else{
-            List<String> list=new ArrayList<>();
-            list.add(subClass);
-            hierarchy.put(superClass,list);
-        }
 
-    }
 
     /**
      * Internal strategy for choose interfaces with parameter
@@ -317,9 +320,6 @@ public class UtilsProcessorImpl {
         }else if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external)){
             interfaces= getInterfacesForExternalStrategy(strings);
         }
-
-
-
         return interfaces;
     }
 
@@ -331,7 +331,7 @@ public class UtilsProcessorImpl {
         return interfaces;
     }
 
-    public static void printHierarchy() {
+    public static void printHierarchyFile() {
         try {
             PrintWriter printWriter=new PrintWriter(InitUtils.getOutput()+"hierarchy.txt");
             Set<String> set=hierarchy.keySet();
@@ -346,5 +346,178 @@ public class UtilsProcessorImpl {
 
         }
 
+    }
+
+    public static void printHierarchy() {
+        try {
+            printClassChildren();
+            printAbstractClass();
+            printInterfaceChildren();
+            printHierarchyFile();
+        } catch (FileNotFoundException e) {
+
+        }
+    }
+
+    private static void printClassChildren() throws FileNotFoundException {
+        PrintWriter printWriter = new PrintWriter(InitUtils.getOutput() + "Classes.txt");
+        Set<String> set = classChildren.keySet();
+        Iterator<String> it = set.iterator();
+        while (it.hasNext()) {
+            String current = it.next();
+            List<String> list = classChildren.get(current);
+            printWriter.write(current + " : " + list + "\n");
+        }
+        printWriter.close();
+    }
+
+    private static void printAbstractClass() throws FileNotFoundException {
+        PrintWriter printWriter = new PrintWriter(InitUtils.getOutput() + "AbstractClasses.txt");
+
+        for(int i=0;i<abstractClass.size();i++) {
+            printWriter.write(abstractClass.get(i)+ "\n");
+        }
+
+        printWriter.close();
+    }
+
+    private static void printInterfaceChildren() throws FileNotFoundException {
+        PrintWriter printWriter = new PrintWriter(InitUtils.getOutput() + "Interfaces.txt");
+        Set<String> set = interfaceChildren.keySet();
+        Iterator<String> it = set.iterator();
+        while (it.hasNext()) {
+            String current = it.next();
+            List<String> list = interfaceChildren.get(current);
+            printWriter.write(current + " : " + list + "\n");
+        }
+        printWriter.close();
+    }
+
+    public static void addAbstractClass(String qualifiedName, Set<CtTypeReference<?>> superInterfaces, CtTypeReference<?> superClass) {
+        if(!abstractClass.contains(qualifiedName)) {
+            abstractClass.add(qualifiedName);
+        }
+        addSuperInterfaces(qualifiedName,superInterfaces);
+        addSuperClass(qualifiedName, superClass);
+    }
+
+
+
+
+    public static void addClass(String qualifiedName, Set<CtTypeReference<?>> superInterfaces, CtTypeReference<?> superClass) {
+        addSuperInterfaces(qualifiedName,superInterfaces);
+        addSuperClass(qualifiedName, superClass);
+    }
+
+    public static void addInterface(String qualifiedName, Set<CtTypeReference<?>> strings) {
+        addSuperInterfaces(qualifiedName, strings);
+    }
+
+
+
+    private static void addSuperClass(String subClass, CtTypeReference<?> superClass) {
+
+        if(isClassProject(superClass)){
+            String superClassName=superClass.getQualifiedName();
+            if(classChildren.containsKey(superClassName)){
+                if(!classChildren.get(superClassName).contains(subClass)) {
+                    classChildren.get(superClassName).add(subClass);
+                }
+            }else{
+                List<String> list=new ArrayList<>();
+                list.add(subClass);
+                classChildren.put(superClassName,list);
+            }
+        }
+    }
+
+    private static void addSuperInterfaces(String qualifiedName, Set<CtTypeReference<?>> superInterfaces) {
+        Iterator<CtTypeReference<?>> iterator=superInterfaces.iterator();
+
+        while(iterator.hasNext()){
+            CtTypeReference current=iterator.next();
+
+            if(isClassProject(current)){
+                UtilsProcessorImpl.addInterfaceLink(current.getQualifiedName(), qualifiedName);
+            }
+        }
+    }
+
+    private static boolean isClassProject(CtTypeReference<?> type){
+        String pack;
+        if(type==null){
+            return false;
+        }
+        if(type.getPackage()==null){
+            pack=type.getDeclaringType().getPackage().getSimpleName();
+        }else{
+            pack=type.getPackage().getSimpleName();
+        }
+
+        if(pack.contains(InitUtils.getGroupId())){
+            return true;
+        }
+        return false;
+    }
+
+    private static void addInterfaceLink(String superClass, String subClass) {
+        if(interfaceChildren.containsKey(superClass)){
+            if(!interfaceChildren.get(superClass).contains(subClass)) {
+                interfaceChildren.get(superClass).add(subClass);
+            }
+        }else{
+            List<String> list=new ArrayList<>();
+            list.add(subClass);
+            interfaceChildren.put(superClass,list);
+        }
+    }
+
+
+    public static void createHierarchy() {
+        Set<String> allInterfaces =interfaceChildren.keySet();
+        Iterator<String> iterator=allInterfaces.iterator();
+        while (iterator.hasNext()){
+            String current=iterator.next();
+            List<String> childrenLvlOne=interfaceChildren.get(current);
+            for (int i=0;i<childrenLvlOne.size(); i++) {
+                addChildrenToHierarchy(current, childrenLvlOne.get(i));
+            }
+
+        }
+    }
+
+    private static void addChildrenToHierarchy(String current, String childrenLvlOne) {
+        if( !interfaceChildren.keySet().contains(childrenLvlOne) && !abstractClass.contains(childrenLvlOne)){
+            addHierarchyLink(current,childrenLvlOne);
+        }
+        if(interfaceChildren.containsKey(childrenLvlOne)) {
+            List<String> list=interfaceChildren.get(childrenLvlOne);
+            for(int i=0;i<list.size();i++){
+                addChildrenToHierarchy(current,list.get(i));
+            }
+        }
+        if(classChildren.containsKey(childrenLvlOne)){
+            List<String> list=classChildren.get(childrenLvlOne);
+            for(int i=0;i<list.size();i++){
+                addChildrenToHierarchy(current,list.get(i));
+            }
+        }
+    }
+
+    /**
+     * Add link between Interface and its subclass
+     * @param superClass
+     * @param subClass
+     */
+    public static void addHierarchyLink(String superClass, String subClass) {
+        if(hierarchy.containsKey(superClass)){
+            if(!hierarchy.get(superClass).contains(subClass)) {
+                hierarchy.get(superClass).add(subClass);
+            }
+        }else{
+            List<String> list=new ArrayList<>();
+            list.add(subClass);
+            hierarchy.put(superClass,list);
+        }
     }
 }

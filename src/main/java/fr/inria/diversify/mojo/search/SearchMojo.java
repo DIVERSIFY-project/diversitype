@@ -100,6 +100,7 @@ public class SearchMojo extends AbstractMojo {
                     getLog().info("inspect source code and generate the hierarchy");
                     try {
                         UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+                        UtilsProcessorImpl.createHierarchy();
                     }catch (Exception e){
                         e.printStackTrace();
                     }
