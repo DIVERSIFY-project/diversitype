@@ -121,8 +121,6 @@ public class MutationMojo extends AbstractMojo{
 
         instrumentalizeTestSuite();
 
-        printHierarchy();
-
         getLog().info("mutation...");
         doMutation();
 

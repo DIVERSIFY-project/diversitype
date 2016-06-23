@@ -48,26 +48,6 @@ public class HierarchyProcessor extends AbstractProcessor<CtType> {
             treatInterface(ctInterface);
 
         }
-
-
-       /* element.getSuperInterfaces();
-
-        Set<CtTypeReference<?>> interfaces=element.getSuperInterfaces();
-        Iterator<CtTypeReference<?>> iterator=interfaces.iterator();
-
-        while(iterator.hasNext()){
-            CtTypeReference current=iterator.next();
-            String pack;
-            if(current.getPackage()==null){
-                pack=current.getDeclaringType().getPackage().getSimpleName();
-            }else{
-                pack=current.getPackage().getSimpleName();
-            }
-
-            if(pack.contains(InitUtils.getGroupId())){
-                UtilsProcessorImpl.addHierarchyLink(current.getQualifiedName(),element.getQualifiedName());
-            }
-        }*/
     }
 
     private void treatAbstractClass(CtType element) {
@@ -87,16 +67,5 @@ public class HierarchyProcessor extends AbstractProcessor<CtType> {
     private void treatInterface(CtInterface ctInterface) {
         UtilsProcessorImpl.addInterface(ctInterface.getQualifiedName(), ctInterface.getSuperInterfaces());
     }
-
-    /*private List<String> ctTypeReferenceSetToStringList(Set<CtTypeReference<?>> set){
-        List<String> list=new ArrayList<>();
-
-        Iterator<CtTypeReference<?>> iterator=set.iterator();
-        while (iterator.hasNext()){
-            CtTypeReference ctTypeReference=iterator.next();
-            list.add(ctTypeReference.getQualifiedName());
-        }
-        return list;
-    }*/
 
 }

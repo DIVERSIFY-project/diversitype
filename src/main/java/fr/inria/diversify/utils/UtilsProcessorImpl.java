@@ -32,10 +32,7 @@ import spoon.support.compiler.jdt.JDTBasedSpoonCompiler;
 import spoon.support.reflect.code.CtInvocationImpl;
 import spoon.support.reflect.code.CtLocalVariableImpl;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -86,6 +83,7 @@ public class UtilsProcessorImpl {
      * List of static type for the mutation
      */
     private static List<String> interfaces=new ArrayList<>();
+    private static boolean hierarchyIsAlreadyLearning=false;
 
 
     /**
@@ -323,17 +321,24 @@ public class UtilsProcessorImpl {
         return interfaces;
     }
 
+    /**
+     * Get hashmap with Interfaces and all their children
+     * This HashMap allow to find possibility mutation
+     * @return
+     */
     public static HashMap<String, List<String>> getHierarchy() {
         return hierarchy;
     }
+
 
     public static List<String> getInterfaces() {
         return interfaces;
     }
 
-    public static void printHierarchyFile() {
+
+    private static void printHierarchyFile() {
         try {
-            PrintWriter printWriter=new PrintWriter(InitUtils.getOutput()+"hierarchy.txt");
+            PrintWriter printWriter=new PrintWriter(InitUtils.getLearningDirectory()+"hierarchy.txt");
             Set<String> set=hierarchy.keySet();
             Iterator<String> it=set.iterator();
             while (it.hasNext()){
@@ -348,19 +353,25 @@ public class UtilsProcessorImpl {
 
     }
 
+    /**
+     * Print all files which describe the hierarchy of the project
+     * This files are print in diversitfy repository
+     */
     public static void printHierarchy() {
-        try {
-            printClassChildren();
-            printAbstractClass();
-            printInterfaceChildren();
-            printHierarchyFile();
-        } catch (FileNotFoundException e) {
+        if(!hierarchyIsAlreadyLearning) {
+            try {
+                printClassChildren();
+                printAbstractClass();
+                printInterfaceChildren();
+                printHierarchyFile();
+            } catch (FileNotFoundException e) {
 
+            }
         }
     }
 
     private static void printClassChildren() throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter(InitUtils.getOutput() + "Classes.txt");
+        PrintWriter printWriter = new PrintWriter(InitUtils.getLearningDirectory() + "Classes.txt");
         Set<String> set = classChildren.keySet();
         Iterator<String> it = set.iterator();
         while (it.hasNext()) {
@@ -372,7 +383,7 @@ public class UtilsProcessorImpl {
     }
 
     private static void printAbstractClass() throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter(InitUtils.getOutput() + "AbstractClasses.txt");
+        PrintWriter printWriter = new PrintWriter(InitUtils.getLearningDirectory() + "AbstractClasses.txt");
 
         for(int i=0;i<abstractClass.size();i++) {
             printWriter.write(abstractClass.get(i)+ "\n");
@@ -382,7 +393,7 @@ public class UtilsProcessorImpl {
     }
 
     private static void printInterfaceChildren() throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter(InitUtils.getOutput() + "Interfaces.txt");
+        PrintWriter printWriter = new PrintWriter(InitUtils.getLearningDirectory() + "Interfaces.txt");
         Set<String> set = interfaceChildren.keySet();
         Iterator<String> it = set.iterator();
         while (it.hasNext()) {
@@ -393,6 +404,12 @@ public class UtilsProcessorImpl {
         printWriter.close();
     }
 
+    /**
+     * Record the current abstract class, its superClass and superInterface
+     * @param qualifiedName
+     * @param superInterfaces
+     * @param superClass
+     */
     public static void addAbstractClass(String qualifiedName, Set<CtTypeReference<?>> superInterfaces, CtTypeReference<?> superClass) {
         if(!abstractClass.contains(qualifiedName)) {
             abstractClass.add(qualifiedName);
@@ -402,13 +419,22 @@ public class UtilsProcessorImpl {
     }
 
 
-
-
+    /**
+     * Record superClass and superInterface for the current class, which not interface or abstract class
+     * @param qualifiedName
+     * @param superInterfaces
+     * @param superClass
+     */
     public static void addClass(String qualifiedName, Set<CtTypeReference<?>> superInterfaces, CtTypeReference<?> superClass) {
         addSuperInterfaces(qualifiedName,superInterfaces);
         addSuperClass(qualifiedName, superClass);
     }
 
+    /**
+     * Record the current interface and its superClass
+     * @param qualifiedName
+     * @param strings: superClasses
+     */
     public static void addInterface(String qualifiedName, Set<CtTypeReference<?>> strings) {
         addSuperInterfaces(qualifiedName, strings);
     }
@@ -472,7 +498,10 @@ public class UtilsProcessorImpl {
         }
     }
 
-
+    /**
+     * Analyse interfacesChildren, abstractClass and classChildren
+     * and deduct the hierarchy of the project
+     */
     public static void createHierarchy() {
         Set<String> allInterfaces =interfaceChildren.keySet();
         Iterator<String> iterator=allInterfaces.iterator();
@@ -509,7 +538,7 @@ public class UtilsProcessorImpl {
      * @param superClass
      * @param subClass
      */
-    public static void addHierarchyLink(String superClass, String subClass) {
+    private static void addHierarchyLink(String superClass, String subClass) {
         if(hierarchy.containsKey(superClass)){
             if(!hierarchy.get(superClass).contains(subClass)) {
                 hierarchy.get(superClass).add(subClass);
@@ -520,4 +549,33 @@ public class UtilsProcessorImpl {
             hierarchy.put(superClass,list);
         }
     }
+
+    /**
+     * read the project's hierarchy in the learning txt file.
+     * @param hierarchy: txt File
+     */
+    public static void readHierarchyFile(File hierarchy) throws IOException {
+        hierarchyIsAlreadyLearning=true;
+        FileReader fileReader=new FileReader(hierarchy);
+
+        BufferedReader bufferedReader=new BufferedReader(fileReader);
+        String current=bufferedReader.readLine();
+        while (current!=null){
+            splitAndRecordCurrentHierarchyLine(current);
+            current=bufferedReader.readLine();
+        }
+    }
+
+    private static void splitAndRecordCurrentHierarchyLine(String current) {
+        String[] split=current.split(" : ");
+        String[] classes=split[1].split(", ");
+        List<String> list=new ArrayList<>(Arrays.asList(split[1].split(", ")));
+        String first=list.get(0).substring(1);
+        list.set(0, first);
+        String last=list.get(list.size()-1).substring(0, list.get(list.size() - 1).length() - 1);
+        list.set(list.size() - 1, last);
+        hierarchy.put(split[0],list);
+    }
+
+
 }

@@ -12,6 +12,7 @@ import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -99,8 +100,14 @@ public class SearchMojo extends AbstractMojo {
                 if (InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)) {
                     getLog().info("inspect source code and generate the hierarchy");
                     try {
-                        UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
-                        UtilsProcessorImpl.createHierarchy();
+                        File hierarchy=new File(InitUtils.getLearningDirectory()+"hierarchy.txt");
+                        if(hierarchy.exists()){
+                            UtilsProcessorImpl.readHierarchyFile(hierarchy);
+                        }else {
+                            UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
+                            UtilsProcessorImpl.createHierarchy();
+                            UtilsProcessorImpl.printHierarchy();
+                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }
