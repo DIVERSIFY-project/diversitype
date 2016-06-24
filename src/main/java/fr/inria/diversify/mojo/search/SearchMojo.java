@@ -8,6 +8,7 @@ import fr.inria.diversify.processor.HierarchyProcessor;
 import fr.inria.diversify.processor.StatisticsListProcessor;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsReport;
 import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -102,11 +103,11 @@ public class SearchMojo extends AbstractMojo {
                     try {
                         File hierarchy=new File(InitUtils.getLearningDirectory()+"hierarchy.txt");
                         if(hierarchy.exists()){
-                            UtilsProcessorImpl.readHierarchyFile(hierarchy);
+                            UtilsReport.readHierarchyFile(hierarchy);
                         }else {
                             UtilsProcessorImpl.spoonLauncher(projectDirectory, InitUtils.getTmpDirectory() + InitUtils.getSourceDirectory(), new HierarchyProcessor(), false);
-                            UtilsProcessorImpl.createHierarchy();
-                            UtilsProcessorImpl.printHierarchy();
+                            UtilsReport.createHierarchy();
+                            UtilsReport.printHierarchy();
                         }
                     }catch (Exception e){
                         e.printStackTrace();
@@ -159,6 +160,9 @@ public class SearchMojo extends AbstractMojo {
         }
 
     }
+
+
+
 
 
 }

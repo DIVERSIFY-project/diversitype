@@ -60,6 +60,14 @@ public class InitUtils {
 
     private static String learningExt="target/diversiType_learning/";
 
+    private static String reportExt="target/diversiType_report/";
+
+
+    /**
+     *
+     */
+    private static String reportDirectory;
+
     /**
      * directory contain the learned information during plugin execution
      */
@@ -124,10 +132,14 @@ public class InitUtils {
         jarLocation=jarLocat;
         outputDirectory=projectDirectory+ext;
         tmpDirectory = outputDirectory + "tmp_mutation/";
+
         learningDirectory=projectDirectory+learningExt;
+        reportDirectory=projectDirectory+reportExt;
 
         cleanDiversitypeRepository();
-        addLearningRepository();
+        createDirectory(learningDirectory);
+        createDirectory(reportDirectory);
+
 
         File dir = new File(tmpDirectory);
         dir.mkdirs();
@@ -142,13 +154,13 @@ public class InitUtils {
         return tmpDirectory;
     }
 
-    private static void addLearningRepository() {
-        File dir = new File(learningDirectory);
+    public static void createDirectory(String repo){
+        File dir = new File(repo);
         if(dir !=null && !dir.exists()) {
             dir.mkdirs();
         }
-
     }
+
 
     private static void cleanDiversitypeRepository() {
 
@@ -274,6 +286,10 @@ public class InitUtils {
 
     public static CandidatesStrategy getCandidatesStrategy(){
         return candidatesStrategy;
+    }
+
+    public static String getReportDirectory() {
+        return reportDirectory;
     }
 
     public static String getLearningDirectory() {

@@ -11,6 +11,7 @@ import fr.inria.diversify.mojo.mutation.transformation.DiversiTypeTransformation
 import fr.inria.diversify.processor.TestWatcherProcessor;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsReport;
 import fr.inria.diversify.utils.UtilsTestProcessorImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -130,7 +131,7 @@ public class MutationMojo extends AbstractMojo{
     }
 
     private void printHierarchy() {
-        UtilsProcessorImpl.printHierarchy();
+        UtilsReport.printHierarchy();
     }
 
     private void deleteTmpDirectory() {

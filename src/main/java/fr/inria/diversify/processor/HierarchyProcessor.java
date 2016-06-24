@@ -2,6 +2,7 @@ package fr.inria.diversify.processor;
 
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsReport;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtInterface;
@@ -53,19 +54,19 @@ public class HierarchyProcessor extends AbstractProcessor<CtType> {
     private void treatAbstractClass(CtType element) {
         Set<CtTypeReference<?>> superInterfaces=element.getSuperInterfaces();
         CtTypeReference<?> superClass=element.getSuperclass();
-        UtilsProcessorImpl.addAbstractClass(element.getQualifiedName(), superInterfaces, superClass);
+        UtilsReport.addAbstractClass(element.getQualifiedName(), superInterfaces, superClass);
 
     }
 
     private void treatClass(CtClass element) {
         Set<CtTypeReference<?>> superInterfaces=element.getSuperInterfaces();
         CtTypeReference<?> superClass=element.getSuperclass();
-        UtilsProcessorImpl.addClass(element.getQualifiedName(),superInterfaces,superClass);
+        UtilsReport.addClass(element.getQualifiedName(),superInterfaces,superClass);
 
     }
 
     private void treatInterface(CtInterface ctInterface) {
-        UtilsProcessorImpl.addInterface(ctInterface.getQualifiedName(), ctInterface.getSuperInterfaces());
+        UtilsReport.addInterface(ctInterface.getQualifiedName(), ctInterface.getSuperInterfaces());
     }
 
 }

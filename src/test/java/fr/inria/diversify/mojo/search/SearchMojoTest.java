@@ -2,6 +2,7 @@ package fr.inria.diversify.mojo.search;
 
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsReport;
 import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -138,7 +139,7 @@ public class SearchMojoTest {
         assertNotNull(myMojo);
         myMojo.execute();
 
-        HashMap<String,List<String>> hashMap= UtilsProcessorImpl.getHierarchy();
+        HashMap<String,List<String>> hashMap= UtilsReport.getHierarchy();
 
         if(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.internal)){
             assertTrue(!hashMap.isEmpty());

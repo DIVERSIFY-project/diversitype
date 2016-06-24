@@ -4,6 +4,7 @@ import fr.inria.diversify.exceptions.NoAlternativesException;
 import fr.inria.diversify.mojo.mutation.strategy.MutationStrategy;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
+import fr.inria.diversify.utils.UtilsReport;
 import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -70,7 +71,7 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
             throw new NotImplementedException();
 
         }else if(candidatesStrategy.equals(CandidatesStrategy.internal)){
-            alltypes=UtilsProcessorImpl.getHierarchy().get(UtilsProcessorImpl.getStaticType(elementToTransplant).getName());
+            alltypes= UtilsReport.getHierarchy().get(UtilsProcessorImpl.getStaticType(elementToTransplant).getName());
             alltypes.remove(elementToTransplant.getType().toString());
         }else{
             //TODO throws exception?

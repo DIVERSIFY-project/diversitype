@@ -3,7 +3,6 @@ package fr.inria.diversify.utils;
 import fr.inria.diversify.exceptions.NotInterfacesUsefullException;
 import fr.inria.diversify.learning.UtilsLearning;
 import fr.inria.diversify.logger.LogWriter;
-import fr.inria.diversify.processor.StatisticsListProcessor;
 import fr.inria.diversify.utils.selectionStrategy.CandidatesSelectStrategy;
 import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
 import fr.inria.diversify.utils.selectionStrategy.strategy.ExternalLibraryStrategy;
@@ -11,8 +10,6 @@ import fr.inria.diversify.utils.selectionStrategy.strategy.InternalTypeStrategy;
 import org.reflections.Reflections;
 import spoon.Launcher;
 import spoon.SpoonAPI;
-import spoon.compiler.SpoonCompiler;
-import spoon.processing.ProcessingManager;
 import spoon.processing.Processor;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtConstructorCall;
@@ -22,13 +19,8 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.factory.FactoryImpl;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.support.DefaultCoreFactory;
-import spoon.support.QueueProcessingManager;
-import spoon.support.StandardEnvironment;
-import spoon.support.compiler.jdt.JDTBasedSpoonCompiler;
 import spoon.support.reflect.code.CtInvocationImpl;
 import spoon.support.reflect.code.CtLocalVariableImpl;
 
@@ -37,7 +29,7 @@ import java.util.*;
 
 /**
  *
- *Class which contains methods for treat specific node in the source code
+ *This class manage the mutation
  *(Exclude test suite)
  *
  * Created by guerin on 29/03/16.
@@ -54,36 +46,13 @@ public class UtilsProcessorImpl {
      */
     private static List<CtConstructorCall> selected=new ArrayList<>();
 
-    /**
-     * represent link between interfaces and all possibility
-     */
-    private static HashMap<String,List<String>> hierarchy=new HashMap<>();
-
-
-
-    /**
-     * represent link between interface and concrete type (lvl 1)
-     */
-    private static HashMap<String,List<String>> interfaceChildren=new HashMap<>();
-
-    /**
-     *represent link between abstract class and concrete type (lvl 1)
-     */
-    private static List<String> abstractClass=new ArrayList<>();
-
-    /**
-     * represent link between class and his children (lvl1)
-     */
-    private static HashMap<String,List<String>> classChildren=new HashMap<>();
-
-
 
 
     /**
      * List of static type for the mutation
      */
     private static List<String> interfaces=new ArrayList<>();
-    private static boolean hierarchyIsAlreadyLearning=false;
+
 
 
     /**
@@ -235,6 +204,7 @@ public class UtilsProcessorImpl {
 
         }
         List<String> result=new ArrayList<>();
+        HashMap<String,List<String>> hierarchy=UtilsReport.getHierarchy();
 
         Set<String> keys=hierarchy.keySet();
         Iterator<String> it=keys.iterator();
@@ -253,6 +223,7 @@ public class UtilsProcessorImpl {
     }
 
     private static List<String> checkGivenInterf(List<String> interf) {
+        HashMap<String,List<String>> hierarchy=UtilsReport.getHierarchy();
         for(int i=0;i<interf.size();i++){
             if(!hierarchy.containsKey(interf.get(i))){
                 interf.remove(interf.get(i));
@@ -321,261 +292,7 @@ public class UtilsProcessorImpl {
         return interfaces;
     }
 
-    /**
-     * Get hashmap with Interfaces and all their children
-     * This HashMap allow to find possibility mutation
-     * @return
-     */
-    public static HashMap<String, List<String>> getHierarchy() {
-        return hierarchy;
-    }
-
-
     public static List<String> getInterfaces() {
         return interfaces;
     }
-
-
-    private static void printHierarchyFile() {
-        try {
-            PrintWriter printWriter=new PrintWriter(InitUtils.getLearningDirectory()+"hierarchy.txt");
-            Set<String> set=hierarchy.keySet();
-            Iterator<String> it=set.iterator();
-            while (it.hasNext()){
-                String current=it.next();
-                List<String> list=hierarchy.get(current);
-                printWriter.write(current+" : "+list+"\n");
-            }
-            printWriter.close();
-        } catch (FileNotFoundException e) {
-
-        }
-
-    }
-
-    /**
-     * Print all files which describe the hierarchy of the project
-     * This files are print in diversitfy repository
-     */
-    public static void printHierarchy() {
-        if(!hierarchyIsAlreadyLearning) {
-            try {
-                printClassChildren();
-                printAbstractClass();
-                printInterfaceChildren();
-                printHierarchyFile();
-            } catch (FileNotFoundException e) {
-
-            }
-        }
-    }
-
-    private static void printClassChildren() throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter(InitUtils.getLearningDirectory() + "Classes.txt");
-        Set<String> set = classChildren.keySet();
-        Iterator<String> it = set.iterator();
-        while (it.hasNext()) {
-            String current = it.next();
-            List<String> list = classChildren.get(current);
-            printWriter.write(current + " : " + list + "\n");
-        }
-        printWriter.close();
-    }
-
-    private static void printAbstractClass() throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter(InitUtils.getLearningDirectory() + "AbstractClasses.txt");
-
-        for(int i=0;i<abstractClass.size();i++) {
-            printWriter.write(abstractClass.get(i)+ "\n");
-        }
-
-        printWriter.close();
-    }
-
-    private static void printInterfaceChildren() throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter(InitUtils.getLearningDirectory() + "Interfaces.txt");
-        Set<String> set = interfaceChildren.keySet();
-        Iterator<String> it = set.iterator();
-        while (it.hasNext()) {
-            String current = it.next();
-            List<String> list = interfaceChildren.get(current);
-            printWriter.write(current + " : " + list + "\n");
-        }
-        printWriter.close();
-    }
-
-    /**
-     * Record the current abstract class, its superClass and superInterface
-     * @param qualifiedName
-     * @param superInterfaces
-     * @param superClass
-     */
-    public static void addAbstractClass(String qualifiedName, Set<CtTypeReference<?>> superInterfaces, CtTypeReference<?> superClass) {
-        if(!abstractClass.contains(qualifiedName)) {
-            abstractClass.add(qualifiedName);
-        }
-        addSuperInterfaces(qualifiedName,superInterfaces);
-        addSuperClass(qualifiedName, superClass);
-    }
-
-
-    /**
-     * Record superClass and superInterface for the current class, which not interface or abstract class
-     * @param qualifiedName
-     * @param superInterfaces
-     * @param superClass
-     */
-    public static void addClass(String qualifiedName, Set<CtTypeReference<?>> superInterfaces, CtTypeReference<?> superClass) {
-        addSuperInterfaces(qualifiedName,superInterfaces);
-        addSuperClass(qualifiedName, superClass);
-    }
-
-    /**
-     * Record the current interface and its superClass
-     * @param qualifiedName
-     * @param strings: superClasses
-     */
-    public static void addInterface(String qualifiedName, Set<CtTypeReference<?>> strings) {
-        addSuperInterfaces(qualifiedName, strings);
-    }
-
-
-
-    private static void addSuperClass(String subClass, CtTypeReference<?> superClass) {
-
-        if(isClassProject(superClass)){
-            String superClassName=superClass.getQualifiedName();
-            if(classChildren.containsKey(superClassName)){
-                if(!classChildren.get(superClassName).contains(subClass)) {
-                    classChildren.get(superClassName).add(subClass);
-                }
-            }else{
-                List<String> list=new ArrayList<>();
-                list.add(subClass);
-                classChildren.put(superClassName,list);
-            }
-        }
-    }
-
-    private static void addSuperInterfaces(String qualifiedName, Set<CtTypeReference<?>> superInterfaces) {
-        Iterator<CtTypeReference<?>> iterator=superInterfaces.iterator();
-
-        while(iterator.hasNext()){
-            CtTypeReference current=iterator.next();
-
-            if(isClassProject(current)){
-                UtilsProcessorImpl.addInterfaceLink(current.getQualifiedName(), qualifiedName);
-            }
-        }
-    }
-
-    private static boolean isClassProject(CtTypeReference<?> type){
-        String pack;
-        if(type==null){
-            return false;
-        }
-        if(type.getPackage()==null){
-            pack=type.getDeclaringType().getPackage().getSimpleName();
-        }else{
-            pack=type.getPackage().getSimpleName();
-        }
-
-        if(pack.contains(InitUtils.getGroupId())){
-            return true;
-        }
-        return false;
-    }
-
-    private static void addInterfaceLink(String superClass, String subClass) {
-        if(interfaceChildren.containsKey(superClass)){
-            if(!interfaceChildren.get(superClass).contains(subClass)) {
-                interfaceChildren.get(superClass).add(subClass);
-            }
-        }else{
-            List<String> list=new ArrayList<>();
-            list.add(subClass);
-            interfaceChildren.put(superClass,list);
-        }
-    }
-
-    /**
-     * Analyse interfacesChildren, abstractClass and classChildren
-     * and deduct the hierarchy of the project
-     */
-    public static void createHierarchy() {
-        Set<String> allInterfaces =interfaceChildren.keySet();
-        Iterator<String> iterator=allInterfaces.iterator();
-        while (iterator.hasNext()){
-            String current=iterator.next();
-            List<String> childrenLvlOne=interfaceChildren.get(current);
-            for (int i=0;i<childrenLvlOne.size(); i++) {
-                addChildrenToHierarchy(current, childrenLvlOne.get(i));
-            }
-
-        }
-    }
-
-    private static void addChildrenToHierarchy(String current, String childrenLvlOne) {
-        if( !interfaceChildren.keySet().contains(childrenLvlOne) && !abstractClass.contains(childrenLvlOne)){
-            addHierarchyLink(current,childrenLvlOne);
-        }
-        if(interfaceChildren.containsKey(childrenLvlOne)) {
-            List<String> list=interfaceChildren.get(childrenLvlOne);
-            for(int i=0;i<list.size();i++){
-                addChildrenToHierarchy(current,list.get(i));
-            }
-        }
-        if(classChildren.containsKey(childrenLvlOne)){
-            List<String> list=classChildren.get(childrenLvlOne);
-            for(int i=0;i<list.size();i++){
-                addChildrenToHierarchy(current,list.get(i));
-            }
-        }
-    }
-
-    /**
-     * Add link between Interface and its subclass
-     * @param superClass
-     * @param subClass
-     */
-    private static void addHierarchyLink(String superClass, String subClass) {
-        if(hierarchy.containsKey(superClass)){
-            if(!hierarchy.get(superClass).contains(subClass)) {
-                hierarchy.get(superClass).add(subClass);
-            }
-        }else{
-            List<String> list=new ArrayList<>();
-            list.add(subClass);
-            hierarchy.put(superClass,list);
-        }
-    }
-
-    /**
-     * read the project's hierarchy in the learning txt file.
-     * @param hierarchy: txt File
-     */
-    public static void readHierarchyFile(File hierarchy) throws IOException {
-        hierarchyIsAlreadyLearning=true;
-        FileReader fileReader=new FileReader(hierarchy);
-
-        BufferedReader bufferedReader=new BufferedReader(fileReader);
-        String current=bufferedReader.readLine();
-        while (current!=null){
-            splitAndRecordCurrentHierarchyLine(current);
-            current=bufferedReader.readLine();
-        }
-    }
-
-    private static void splitAndRecordCurrentHierarchyLine(String current) {
-        String[] split=current.split(" : ");
-        String[] classes=split[1].split(", ");
-        List<String> list=new ArrayList<>(Arrays.asList(split[1].split(", ")));
-        String first=list.get(0).substring(1);
-        list.set(0, first);
-        String last=list.get(list.size()-1).substring(0, list.get(list.size() - 1).length() - 1);
-        list.set(list.size() - 1, last);
-        hierarchy.put(split[0],list);
-    }
-
-
 }

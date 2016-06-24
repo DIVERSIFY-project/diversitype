@@ -127,11 +127,16 @@ For the moment, the number of mutation for test phase is limited to 1 change.
 1. Improve the interface selection algorithm
 
 This version learn which interface or constructor call have not possibility of mutation.
+It record the project's hierarchy too.
 This information are recording in files target/diversiType_learning. 
 
 If your project's source code change, you can delete this directory.
 But, in this case, all the learning is delete and the plugin restart to the beginning.
 If you think that your project's hierarchy have no change, don't delete the directory.
+
+### Version 1.2
+
+The version generate a HTML report into target/diversiType_report.
 
 ## In the future...
 
