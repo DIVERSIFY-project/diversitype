@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+
+    ul {
+    	padding-left: 0px;
+    	margin-top: 5px;
+    	font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+    	font-size: 12px;
+    	color: #4A6782;
+    }
+
+	li{
+    	list-style-type: none;
+    	padding-top: 2px;
+	}
+
+
+</style>
+<body>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+	var ul=document.createElement('ul');
+	d3.json("infos/classes.json", function(error, list){
+		list.classes.forEach(function(classe){
+			var item = document.createElement('li');
+	        item.appendChild(document.createTextNode(classe));
+	        ul.appendChild(item);
+		})
+	})
+
+	document.body.appendChild(ul);
+</script>
+
+</body>
+</html>

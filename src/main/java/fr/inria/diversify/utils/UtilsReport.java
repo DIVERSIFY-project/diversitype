@@ -1,5 +1,6 @@
 package fr.inria.diversify.utils;
 
+import fr.inria.diversify.utils.json.ReportJsonManager;
 import spoon.reflect.reference.CtTypeReference;
 
 import java.io.*;
@@ -84,11 +85,14 @@ public class UtilsReport {
     public static void printHierarchy() {
         if(!hierarchyIsAlreadyLearning) {
             try {
-                printClassChildren();
+                InitUtils.createDirectory(InitUtils.getReportDirectory() + repoJSON);
+                /*printClassChildren();
                 printAbstractClass();
-                printInterfaceChildren();
+                printInterfaceChildren();*/
                 printHierarchyFile();
+                //generateGraphJSON();
                 generateJSON();
+                //generateClassesJSON();
                 copyIndexHtml();
             } catch (FileNotFoundException e) {
                 System.out.print(e);
@@ -96,6 +100,11 @@ public class UtilsReport {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static void generateJSON() throws FileNotFoundException {
+        ReportJsonManager jsonManager=new ReportJsonManager(InitUtils.getReportDirectory() + repoJSON);
+        jsonManager.printJsonFiles();
     }
 
 
@@ -109,7 +118,7 @@ public class UtilsReport {
     }
 
 
-    private static void printClassChildren() throws FileNotFoundException {
+   /* private static void printClassChildren() throws FileNotFoundException {
         PrintWriter printWriter = new PrintWriter(InitUtils.getReportDirectory() + "Classes.txt");
         Set<String> set = classChildren.keySet();
         Iterator<String> it = set.iterator();
@@ -141,7 +150,7 @@ public class UtilsReport {
             printWriter.write(current + " : " + list + "\n");
         }
         printWriter.close();
-    }
+    }*/
 
     /**
      * Record the current abstract class, its superClass and superInterface
@@ -299,7 +308,7 @@ public class UtilsReport {
         }else{
             List<String> list=new ArrayList<>();
             list.add(subClass);
-            hierarchy.put(superClass,list);
+            hierarchy.put(superClass, list);
         }
     }
 
@@ -329,10 +338,33 @@ public class UtilsReport {
         hierarchy.put(split[0], list);
     }
 
-    private static void generateJSON() throws FileNotFoundException {
-        InitUtils.createDirectory(InitUtils.getReportDirectory()+repoJSON);
-        PrintWriter printWriter = new PrintWriter(InitUtils.getReportDirectory()+repoJSON + "graph.json");
+    public static Set<String> getClasseSet(){
+        return classesToNumber.keySet();
+    }
 
+    public static HashMap<String, Integer> getClassesToNumber() {
+        return classesToNumber;
+    }
+
+    public static HashMap<Integer, String> getNumberToClasses() {
+        return numberToClasses;
+    }
+
+    public static HashMap<String, List<String>> getClassChildren() {
+        return classChildren;
+    }
+
+    public static List<String> getAbstractClass() {
+        return abstractClass;
+    }
+
+    public static HashMap<String, List<String>> getInterfaceChildren() {
+        return interfaceChildren;
+    }
+
+    /*private static void generateGraphJSON() throws FileNotFoundException {
+
+        PrintWriter printWriter = new PrintWriter(InitUtils.getReportDirectory()+repoJSON + "graph.json");
         printWriter.write("{");
         printWriter.write("\"nodes\":[");
         addClassesIntoNodes(printWriter);
@@ -345,8 +377,6 @@ public class UtilsReport {
         printWriter.write(links);
         printWriter.write("]}");
         printWriter.close();
-
-
     }
 
 
@@ -394,7 +424,23 @@ public class UtilsReport {
             return 2;
         }
         return 3;
-    }
+    }*/
+
+    /*private static void generateClassesJSON() throws FileNotFoundException {
+        PrintWriter printWriter = new PrintWriter(InitUtils.getReportDirectory()+repoJSON + "classes.json");
+        Set<String> classes=classesToNumber.keySet();
+        Iterator<String> it=classes.iterator();
+        String json="{\"classes\":[";
+        while (it.hasNext()){
+            String current=it.next();
+            json=json+"\""+current+"\",";
+        }
+        String sub=json.substring(0,json.length()-1);
+        printWriter.write( sub+"]}");
+        printWriter.close();
+
+    }*/
+
 
     public static String getIndexHTMLcode(){
         return "<!DOCTYPE html>\n" +
