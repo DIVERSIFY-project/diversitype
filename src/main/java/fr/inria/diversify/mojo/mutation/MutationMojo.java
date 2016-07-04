@@ -108,7 +108,7 @@ public class MutationMojo extends AbstractMojo{
     private List<CtConstructorCall> selectedCandidates;
 
     private PrintWriter printWriter;
-
+    private int nbMutation=0;
 
 
     @Override
@@ -127,7 +127,7 @@ public class MutationMojo extends AbstractMojo{
 
         deleteTmpDirectory();
 
-        //printOutResult
+
     }
 
     private void printHierarchy() {
@@ -192,6 +192,7 @@ public class MutationMojo extends AbstractMojo{
                 //restoration
                 getLog().info("project restoration");
                 transformation.restore();
+                nbMutation++;
             }catch (NoAlternativesException e){
                 getLog().info("there are not alternative for the current candidates");
                 getLog().info("add "+selectedCandidates.get(i)+" to learning files");
@@ -199,7 +200,7 @@ public class MutationMojo extends AbstractMojo{
             }
         }
 
-        getPrintWriter().close();
+
 
     }
 
@@ -207,26 +208,46 @@ public class MutationMojo extends AbstractMojo{
         UtilsLearning.addInterface(interfaces);
     }
 
-    private void printResultTorCurrentTransfo(String staticType, CtConstructorCall ctConstructorCall, CtConstructorCall newCtConstructorCall, boolean coverageIsNull, List<String> listTestCurrentT, List<String> testMainProject) {
+    private void printResultTorCurrentTransfo(String staticType, CtConstructorCall ctConstructorCall, CtConstructorCall newCtConstructorCall, boolean coverageIsNull, List<String> listTestCurrentT, List<String> testMainProject)  {
         PrintWriter out=getPrintWriter();
         String result="For the mutation: static type: "+staticType+", concrete type: "+ctConstructorCall.getType()+", mutation: "+newCtConstructorCall.getType()+"\n"
                 +"mutation position: "+ctConstructorCall.getPosition().toString()+"\n" ;
         if(coverageIsNull){
             result=result+"the code coverage is not assured";
+
         }
 
         result=result+"\n\n"+getCommonTest(listTestCurrentT,testMainProject)+getImprovement(listTestCurrentT,testMainProject)+getRegression(listTestCurrentT,testMainProject);
         out.write(result);
+        out.close();
+
+        printCoverageResult();
+
 
     }
 
+
+
+    private void printCoverageResult() {
+
+        try {
+            File resulttestcasetransfo=new File(InitUtils.getOutput()+"resultTestCaseTransfo.txt");
+            FileReader file= new FileReader(resulttestcasetransfo);
+            BufferedReader bufferedReader=new BufferedReader(file);
+
+            //TODO:transform to JSOn in the report directory
+            resulttestcasetransfo.delete();
+        } catch (FileNotFoundException e) {
+          //TODO
+        }
+
+    }
 
 
     private List<String> compareResults(HashMap<String, List<String>> hashMap, List<String> testSuiteFailCurrentT, CtConstructorCall ctConstructorCall) {
         if(hashMap.isEmpty()){//if the constructorCall is a field
             return testSuiteFailCurrentT;
         }else {
-
             List<String> coverageTests = hashMap.get(ctConstructorCall.getPosition().toString());
             List<String> results=new ArrayList<>();
 
@@ -235,7 +256,6 @@ public class MutationMojo extends AbstractMojo{
                     results.add(coverageTests.get(i));
                 }
             }
-
             return results;
         }
     }
@@ -287,7 +307,8 @@ public class MutationMojo extends AbstractMojo{
 
 
     /**
-     * TODO treat parameters and switch strategy
+     *
+     *
      * @param
      * @return
      */
@@ -341,13 +362,14 @@ public class MutationMojo extends AbstractMojo{
     }
 
     private PrintWriter getPrintWriter() {
-        if(printWriter==null){
-            try {
-                printWriter=new PrintWriter(InitUtils.getOutput()+"diversiType.txt");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+
+        try {
+            InitUtils.createDirectory(InitUtils.getOutput()+nbMutation);
+            printWriter=new PrintWriter(InitUtils.getOutput()+nbMutation+"/diversiType.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
+
         return printWriter;
     }
 

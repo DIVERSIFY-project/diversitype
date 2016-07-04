@@ -73,16 +73,19 @@ public class UtilsProcessorImpl {
         compareWithLearning();
 
 
-        if(n>=candidates.size()) {
+
+
+        if(n>=candidates.size() || n==-1) {
             selected = candidates;
             return candidates;
         }
 
         Random r = new Random();
-
+        List<CtConstructorCall> list=candidates;
         for(int i=0;i<n;i++){
-            int valeur =r.nextInt(candidates.size());
-            selected.add(candidates.get(valeur));
+            int valeur =r.nextInt(list.size());
+            selected.add(list.get(valeur));
+            list.remove(valeur);
         }
         return selected;
     }
@@ -196,7 +199,6 @@ public class UtilsProcessorImpl {
 
     private static List<String> selectInterfaceInHierarchy() throws NotInterfacesUsefullException {
 
-        //TODO LEARN: comparer avec le fichier d'apprentissage
         List<String> learning=new ArrayList<>();
         try {
             learning= UtilsLearning.readInterfacesLearning();

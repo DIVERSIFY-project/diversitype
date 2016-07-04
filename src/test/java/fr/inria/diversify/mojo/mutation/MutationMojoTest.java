@@ -63,10 +63,10 @@ public class MutationMojoTest {
         assertNotNull(file);
         assertTrue(!file.exists());
 
-        File fileoutmut=new File(outputDirectory+outputFilemutation);
+       /* File fileoutmut=new File(outputDirectory+outputFilemutation);
         assertNotNull(fileoutmut);
         assertTrue(fileoutmut.exists());
-        assertTrue(fileoutmut.isFile());
+        assertTrue(fileoutmut.isFile());*/
 
         File fileoutsea=new File(outputDirectory+outputFilesearch);
         assertNotNull(fileoutsea);

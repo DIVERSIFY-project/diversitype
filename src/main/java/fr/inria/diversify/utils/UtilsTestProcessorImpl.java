@@ -36,7 +36,7 @@ public class UtilsTestProcessorImpl {
      */
     public static void addTestFail(String testSuiteCurrent, String testCaseCurrent, String failure, String data) {
         if(!testSuiteFail.contains(testSuiteCurrent)){
-            //TODO bien récuperer les informations necessaire
+
             testSuiteFail.add(testSuiteCurrent+":"+testCaseCurrent);
         }
         //System.out.println(testSuiteCurrent+" testCase: "+testCaseCurrent+" failure: "+failure+" data: "+data);

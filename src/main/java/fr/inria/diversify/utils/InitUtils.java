@@ -178,7 +178,7 @@ public class InitUtils {
     private static void loadJarProject() {
         URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         try{
-            //TODO get parameter for jar name
+
             URL url = new File(jarLocation).toURI().toURL();
             Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class<?>[]{URL.class});
             addURL.setAccessible(true);

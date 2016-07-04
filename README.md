@@ -137,6 +137,11 @@ If you think that your project's hierarchy have no change, don't delete the dire
 ### Version 1.2
 
 The version generate a HTML report into target/diversiType_report.
+This web page represent 
+
+### Version 2
+This version allow to change the number of change and we can choose all mutation point when we give nchange=-1.
+The mode external is now possible but you should specify an interface.
 
 ## In the future...
 
