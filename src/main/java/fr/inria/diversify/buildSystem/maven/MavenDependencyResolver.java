@@ -31,6 +31,7 @@ public class MavenDependencyResolver {
     Properties properties;
     String baseDir;
     MavenResolver resolver;
+
     ArrayList<String> repositoriesUrls;
 
 

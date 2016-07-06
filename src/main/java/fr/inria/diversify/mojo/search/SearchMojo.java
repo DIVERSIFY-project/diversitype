@@ -114,8 +114,13 @@ public class SearchMojo extends AbstractMojo {
                     }
                 }
 
-                //treat given parameters and deduct the static type use during the mutation
-                finalInterfaces = getInterfaces();
+                if (!(InitUtils.getCandidatesStrategy().equals(CandidatesStrategy.external) && splitInterfaces().isEmpty())) {
+                    //treat given parameters and deduct the static type use during the mutation
+                    finalInterfaces = getInterfaces();
+                }else{
+                    getLog().info("If you choose the external mode, you should specify an interface");
+                    throw new NotInterfacesUsefullException();
+                }
 
                 //analyse source code
                 getLog().info("analyse the source code for "+finalInterfaces);

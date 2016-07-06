@@ -32,7 +32,7 @@
       <dependency>
           <groupId>org.reflections</groupId>
           <artifactId>reflections</artifactId>
-          <version>0.9.9</version>
+          <version>0.9.10</version>
       </dependency>
 
     <dependency>
@@ -218,6 +218,8 @@
         <artifactId>DiversiType</artifactId>
         <version>1.2-SNAPSHOT</version>
         <configuration>
+          <candidateStratregy>external</candidateStratregy>
+          <interfaces>java.util.List</interfaces>
           <projectDirectory>/home/guerin/Documents/INRIA/ExProj/ProjA/</projectDirectory>
           <nChange>-1</nChange>
           <jarLocation>/home/guerin/Documents/INRIA/ExProj/ProjA/target/ProjA-1.0-SNAPSHOT.jar</jarLocation>

@@ -1,21 +1,30 @@
 package fr.inria.diversify.mojo.mutation.builder;
 
+import fr.inria.diversify.buildSystem.maven.MavenDependencyResolver;
 import fr.inria.diversify.exceptions.NoAlternativesException;
 import fr.inria.diversify.mojo.mutation.strategy.MutationStrategy;
 import fr.inria.diversify.utils.InitUtils;
 import fr.inria.diversify.utils.UtilsProcessorImpl;
 import fr.inria.diversify.utils.UtilsReport;
 import fr.inria.diversify.utils.selectionStrategy.strategy.CandidatesStrategy;
+import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.properties.internal.EnvironmentUtils;
+import org.reflections.Reflections;
+import org.reflections.ReflectionsException;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.factory.Factory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 /**
  * Implementation of the constructor call builder
@@ -67,9 +76,7 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
 
         //get all candidates possible
         if(candidatesStrategy.equals(CandidatesStrategy.external)){
-            //TODO
-            throw new NotImplementedException();
-
+            alltypes=getExternalTypes();
         }else if(candidatesStrategy.equals(CandidatesStrategy.internal)){
             alltypes= UtilsReport.getHierarchy().get(UtilsProcessorImpl.getStaticType(elementToTransplant).getName());
             alltypes.remove(elementToTransplant.getType().toString());
@@ -105,6 +112,8 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
             return newCons;
         } catch (ClassNotFoundException e) {
            // e.printStackTrace();
+            return null;
+        }catch (NoClassDefFoundError e){
             return null;
         }
 
@@ -200,5 +209,22 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
         int random = (int)(Math.random() * mutants.size());
         return mutants.get(random);
 
+    }
+
+    private List<String> getExternalTypes() {
+       List<String> list=new ArrayList<>();
+        try {
+            Class current = Class.forName(staticType);
+            Set<Class<?>> subtypes= InitUtils.getReflectionOnM2Maven().getSubTypesOf(current);
+            Iterator<Class<?>> it=subtypes.iterator();
+            while(it.hasNext()){
+                list.add(it.next().getName());
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }catch (ReflectionsException e){
+            e.getMessage();
+        }
+        return list;
     }
 }

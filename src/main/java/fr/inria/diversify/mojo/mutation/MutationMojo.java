@@ -158,6 +158,7 @@ public class MutationMojo extends AbstractMojo{
 
                 String staticType = UtilsProcessorImpl.getStaticType(selectedCandidates.get(i)).getName();
 
+                //This order is important
                 constructorCallBuilder.selElementToTransplant(selectedCandidates.get(i));
                 constructorCallBuilder.setStaticType(staticType);
                 constructorCallBuilder.setMutationStrategy(InitUtils.getMutationStrategy());

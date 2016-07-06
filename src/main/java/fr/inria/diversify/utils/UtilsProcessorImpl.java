@@ -252,6 +252,7 @@ public class UtilsProcessorImpl {
      * Check if interfaces given in parameter can be diversify
      */
     private static List<String> checkSubType(List<String> interf) {
+        List<String> result=new ArrayList<>();
         Reflections reflections = new Reflections(".*");
         for(int i=0;i<interf.size();i++){
             try {
@@ -260,13 +261,16 @@ public class UtilsProcessorImpl {
 
                 if(subtypes.size()<2){
                     LogWriter.isNotAPossibility(current);
-                    interf.remove(current);
+                    //interf.remove(current);
+                }else{
+                    result.add(current.getName());
+                    //TODO: subType somewhere
                 }
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                return new ArrayList<>();
             }
         }
-        return interf;
+        return result;
     }
 
     @Deprecated

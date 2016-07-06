@@ -13,13 +13,16 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.List;
-import java.util.Set;
+import java.net.*;
+
+import java.util.*;
 
 /**
  *
@@ -37,12 +40,12 @@ public class InitUtils {
     /**
      * source directory
      */
-    private static String srcDir="src/main/java/";
+    private static String srcDir = "src/main/java/";
 
     /**
      * Test directory
      */
-    private static String testDir="src/test/java/";
+    private static String testDir = "src/test/java/";
 
     /**
      * tmpDirectory contains sosies during plugin's process
@@ -57,11 +60,11 @@ public class InitUtils {
     /**
      * directory for diversitype plugin
      */
-    private static String ext="target/diversiType/";
+    private static String ext = "target/diversiType/";
 
-    private static String learningExt="target/diversiType_learning/";
+    private static String learningExt = "target/diversiType_learning/";
 
-    private static String reportExt="target/diversiType_report/";
+    private static String reportExt = "target/diversiType_report/";
 
 
     /**
@@ -77,10 +80,10 @@ public class InitUtils {
     /**
      * boolean for init the static class only once
      */
-    private static boolean alreadyInit=false;
+    private static boolean alreadyInit = false;
 
     /**
-     *Strategy use for select the new ConstructorCall
+     * Strategy use for select the new ConstructorCall
      */
     private static MutationStrategy mutationStrategy;
 
@@ -104,11 +107,15 @@ public class InitUtils {
      */
     private static String groupId;
 
-
+    /**
+     *
+     */
+    private static Reflections reflectionOnM2Maven;
 
 
     /**
      * Initialization of project information
+     *
      * @param dirProject
      * @param mutationStrat
      * @param selectedCandidatesStratregy
@@ -120,26 +127,27 @@ public class InitUtils {
     public static String init(String dirProject, String mutationStrat, String selectedCandidatesStratregy, String jarLocat) throws IOException, InterruptedException {
         resolveDepedencies(dirProject);
 
-        if(alreadyInit){
+        if (alreadyInit) {
 
             return tmpDirectory;
         }
 
-        alreadyAnalyse=false;
-        mutationStrategy=getMutationStrategy(mutationStrat);
-        candidatesStrategy=getCandidatesStrategy(selectedCandidatesStratregy);
+        alreadyAnalyse = false;
+        mutationStrategy = getMutationStrategy(mutationStrat);
+        candidatesStrategy = getCandidatesStrategy(selectedCandidatesStratregy);
 
-        projectDirectory=dirProject;
-        jarLocation=jarLocat;
-        outputDirectory=projectDirectory+ext;
+        projectDirectory = dirProject;
+        jarLocation = jarLocat;
+        outputDirectory = projectDirectory + ext;
         tmpDirectory = outputDirectory + "tmp_mutation/";
 
-        learningDirectory=projectDirectory+learningExt;
-        reportDirectory=projectDirectory+reportExt;
+        learningDirectory = projectDirectory + learningExt;
+        reportDirectory = projectDirectory + reportExt;
 
         cleanDiversitypeRepository();
         createDirectory(learningDirectory);
         createDirectory(reportDirectory);
+        getReflectionOnM2Maven();
 
 
         File dir = new File(tmpDirectory);
@@ -150,14 +158,15 @@ public class InitUtils {
 
         loadJarProject();
 
-        alreadyInit=true;
+        alreadyInit = true;
 
         return tmpDirectory;
     }
 
-    public static void createDirectory(String repo){
+
+    public static void createDirectory(String repo) {
         File dir = new File(repo);
-        if(dir !=null && !dir.exists()) {
+        if (dir != null && !dir.exists()) {
             dir.mkdirs();
         }
     }
@@ -165,9 +174,9 @@ public class InitUtils {
 
     private static void cleanDiversitypeRepository() {
 
-        File dir=new File(outputDirectory);
+        File dir = new File(outputDirectory);
 
-        if(dir!=null && dir.exists()) {
+        if (dir != null && dir.exists()) {
             deleteRepository(new File(outputDirectory));
         }
     }
@@ -177,14 +186,13 @@ public class InitUtils {
      */
     private static void loadJarProject() {
         URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        try{
+        try {
 
             URL url = new File(jarLocation).toURI().toURL();
             Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class<?>[]{URL.class});
             addURL.setAccessible(true);
             addURL.invoke(systemClassLoader, new Object[]{url});
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -192,10 +200,11 @@ public class InitUtils {
 
     /**
      * Resolve project's dependencies
+     *
      * @param dirProject
      */
-    public static void resolveDepedencies(String dirProject){
-        MavenDependencyResolver mavenDependencyResolver=new MavenDependencyResolver();
+    public static void resolveDepedencies(String dirProject) {
+        MavenDependencyResolver mavenDependencyResolver = new MavenDependencyResolver();
         try {
             mavenDependencyResolver.DependencyResolver(dirProject + "pom.xml");
 
@@ -210,18 +219,18 @@ public class InitUtils {
      */
     private static void initPomTmp() {
 
-        File pomFile=new File(tmpDirectory+"/pom.xml");
-        Reader reader= null;
+        File pomFile = new File(tmpDirectory + "/pom.xml");
+        Reader reader = null;
         try {
             reader = ReaderFactory.newXmlReader(pomFile);
-            MavenXpp3Reader xpp3=new MavenXpp3Reader();
+            MavenXpp3Reader xpp3 = new MavenXpp3Reader();
 
-            Model model=xpp3.read(reader);
-            groupId=model.getGroupId();
+            Model model = xpp3.read(reader);
+            groupId = model.getGroupId();
             checkPlugins(model);
 
             MavenXpp3Writer mavenXpp3Writer = new MavenXpp3Writer();
-            Writer fileWriter= WriterFactory.newXmlWriter(pomFile);
+            Writer fileWriter = WriterFactory.newXmlWriter(pomFile);
             mavenXpp3Writer.write(fileWriter, model);
             IOUtil.close(fileWriter);
 
@@ -234,11 +243,10 @@ public class InitUtils {
     }
 
 
-
     private static void checkPlugins(Model model) {
-        List<Plugin> pluginList= model.getBuild().getPlugins();
-        for(int i=0;i<pluginList.size();i++){
-            if(pluginList.get(i).getGroupId().contains("fr.inria.diversify")&&pluginList.get(i).getArtifactId().contains("DiversiType")){
+        List<Plugin> pluginList = model.getBuild().getPlugins();
+        for (int i = 0; i < pluginList.size(); i++) {
+            if (pluginList.get(i).getGroupId().contains("fr.inria.diversify") && pluginList.get(i).getArtifactId().contains("DiversiType")) {
                 pluginList.remove(pluginList.get(i));
             }
         }
@@ -246,7 +254,7 @@ public class InitUtils {
     }
 
     public static void setOutputDirectory(String outputDirectory) {
-        InitUtils.outputDirectory = outputDirectory+ext;
+        InitUtils.outputDirectory = outputDirectory + ext;
     }
 
     public static String getOutput() {
@@ -273,19 +281,19 @@ public class InitUtils {
         InitUtils.tmpDirectory = tmpDirectory;
     }
 
-    public static String getTestDirectory(){
+    public static String getTestDirectory() {
         return testDir;
     }
 
-    public static String getSourceDirectory(){
+    public static String getSourceDirectory() {
         return srcDir;
     }
 
-    public static MutationStrategy getMutationStrategy(){
+    public static MutationStrategy getMutationStrategy() {
         return mutationStrategy;
     }
 
-    public static CandidatesStrategy getCandidatesStrategy(){
+    public static CandidatesStrategy getCandidatesStrategy() {
         return candidatesStrategy;
     }
 
@@ -297,7 +305,7 @@ public class InitUtils {
         return learningDirectory;
     }
 
-    public static boolean getAlreadyAnalyse(){
+    public static boolean getAlreadyAnalyse() {
         return alreadyAnalyse;
     }
 
@@ -310,19 +318,18 @@ public class InitUtils {
     }
 
 
-
     public static void deleteTmpDirectory() {
         File dir = new File(tmpDirectory);
         deleteRepository(dir);
     }
 
-    private static void deleteRepository(File r){
-        File [] fileList = r.listFiles();
-        for(int i = 0;i<fileList.length;i++){
-            if(fileList[i].isDirectory() ){
+    private static void deleteRepository(File r) {
+        File[] fileList = r.listFiles();
+        for (int i = 0; i < fileList.length; i++) {
+            if (fileList[i].isDirectory()) {
                 deleteRepository(fileList[i]);
                 fileList[i].delete();
-            }else{
+            } else {
                 fileList[i].delete();
             }
         }
@@ -333,11 +340,45 @@ public class InitUtils {
         InitUtils.alreadyAnalyse = alreadyAnalyse;
     }
 
+
+
+    private static URL[] loadM2MavenJar() {
+        File repository = new File(System.getProperty("user.home") + File.separator + ".m2/repository");
+
+        List<URL> result = null;
+        try {
+            result = scanDirectory(repository);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return result.toArray(new URL[0]);
+    }
+
+    private static List<URL> scanDirectory(File repository) throws MalformedURLException, URISyntaxException {
+        List<URL> urlsJar = new ArrayList<>();
+        if (repository.exists()) {
+            File[] fileList = repository.listFiles();
+            for (int i = 0; i < fileList.length; i++) {
+                if (fileList[i].isDirectory()) {
+                    urlsJar.addAll(scanDirectory(fileList[i]));
+                } else {
+                    if (fileList[i].getName().endsWith(".jar")) {
+
+                        urlsJar.add(new File(fileList[i].getAbsolutePath()).toURI().toURL());
+                    }
+                }
+            }
+        }
+        return urlsJar;
+    }
+
     private static class TargetFileFilter implements FileFilter {
 
         @Override
         public boolean accept(File pathname) {
-            if (pathname.getAbsolutePath().contains(projectDirectory+"/target")) {
+            if (pathname.getAbsolutePath().contains(projectDirectory + "/target")) {
                 return false;
             }
             return true;
@@ -345,18 +386,40 @@ public class InitUtils {
     }
 
     private static CandidatesStrategy getCandidatesStrategy(String selectedCandidatesStratregy) {
-        switch (selectedCandidatesStratregy){
-            case "internal": return CandidatesStrategy.internal;
-            case "external":return CandidatesStrategy.external;
-            default:return CandidatesStrategy.internal;
+        switch (selectedCandidatesStratregy) {
+            case "internal":
+                return CandidatesStrategy.internal;
+            case "external":
+                return CandidatesStrategy.external;
+            default:
+                return CandidatesStrategy.internal;
         }
     }
 
     private static MutationStrategy getMutationStrategy(String mutationStrategy) {
-        switch (mutationStrategy){
-            case "one": return MutationStrategy.one;
-            case "random":return MutationStrategy.random;
-            default:return MutationStrategy.random;
+        switch (mutationStrategy) {
+            case "one":
+                return MutationStrategy.one;
+            case "random":
+                return MutationStrategy.random;
+            default:
+                return MutationStrategy.random;
         }
+    }
+
+
+
+    public static Reflections getReflectionOnM2Maven() {
+
+        if(reflectionOnM2Maven==null) {
+            URLClassLoader classLoader = new URLClassLoader(loadM2MavenJar());
+
+            reflectionOnM2Maven=new Reflections(
+                    new ConfigurationBuilder().setUrls(
+                            ClasspathHelper.forClassLoader(classLoader)
+                    ).addClassLoader(classLoader).setScanners(new SubTypesScanner(false)
+                    ));
+        }
+        return reflectionOnM2Maven;
     }
 }
