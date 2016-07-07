@@ -17,10 +17,13 @@ import org.reflections.util.ConfigurationBuilder;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.factory.Factory;
+import sun.misc.URLClassPath;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -216,6 +219,9 @@ public class ConstructorCallBuilderWithStrategy extends ConstructorCallBuilder{
         try {
             Class current = Class.forName(staticType);
             Set<Class<?>> subtypes= InitUtils.getReflectionOnM2Maven().getSubTypesOf(current);
+            Set<Class<?>> nativeSubuTypes=InitUtils.getNativeClassesJava().getSubTypesOf(current);
+            //Set<Class<?>> systemSubTypes=InitUtils.getSystemClassesJava().getSubTypesOf(current);
+            subtypes.addAll(nativeSubuTypes);
             Iterator<Class<?>> it=subtypes.iterator();
             while(it.hasNext()){
                 list.add(it.next().getName());

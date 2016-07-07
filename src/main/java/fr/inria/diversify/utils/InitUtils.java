@@ -17,8 +17,10 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import sun.misc.URLClassPath;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
 
@@ -112,6 +114,9 @@ public class InitUtils {
      */
     private static Reflections reflectionOnM2Maven;
 
+    private static Reflections nativeReflection;
+    private static Reflections sysReflection;
+
 
     /**
      * Initialization of project information
@@ -147,7 +152,7 @@ public class InitUtils {
         cleanDiversitypeRepository();
         createDirectory(learningDirectory);
         createDirectory(reportDirectory);
-        getReflectionOnM2Maven();
+        //getReflectionOnM2Maven();
 
 
         File dir = new File(tmpDirectory);
@@ -374,6 +379,8 @@ public class InitUtils {
         return urlsJar;
     }
 
+
+
     private static class TargetFileFilter implements FileFilter {
 
         @Override
@@ -422,4 +429,34 @@ public class InitUtils {
         }
         return reflectionOnM2Maven;
     }
+
+    public static Reflections getNativeClassesJava(){
+        if(nativeReflection==null) {
+
+            Method m = null;
+            try {
+                m = ClassLoader.class.getDeclaredMethod("getBootstrapClassPath");
+                m.setAccessible(true);
+                Object bootstrap = m.invoke(null);
+
+                URLClassLoader classLoader = new URLClassLoader(((URLClassPath)bootstrap).getURLs());
+
+                nativeReflection=new Reflections(
+                        new ConfigurationBuilder().setUrls(
+                                ClasspathHelper.forClassLoader(classLoader)
+                        ).addClassLoader(classLoader).setScanners(new SubTypesScanner(false)
+                        ));
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return nativeReflection;
+    }
+
+
 }
