@@ -212,35 +212,6 @@
       </configuration>
     </plugin>
 
-      <plugin>
-
-        <groupId>fr.inria.diversify</groupId>
-        <artifactId>DiversiType</artifactId>
-        <version>1.2-SNAPSHOT</version>
-        <configuration>
-          <candidateStratregy>external</candidateStratregy>
-          <interfaces>java.util.List</interfaces>
-          <projectDirectory>/home/guerin/Documents/INRIA/ExProj/ProjA/</projectDirectory>
-          <nChange>-1</nChange>
-          <jarLocation>/home/guerin/Documents/INRIA/ExProj/ProjA/target/ProjA-1.0-SNAPSHOT.jar</jarLocation>
-        </configuration>
-        <executions>
-          <execution>
-            <id>search execution</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>search</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>mutation exectution</id>
-            <phase>test</phase>
-            <goals>
-              <goal>mutation</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
 
 
     </plugins>

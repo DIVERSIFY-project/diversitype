@@ -90,19 +90,19 @@ This report indicate the mutations made: (ex: for the mutation, List l=new Array
 + The analysed interface (ex: java.util.List)
 + The mutation point ( ex:{path_to_the_mutation_point}: new ArrayList())
 + The concrete type that was changed ( ex: java.util.ArrayList)
-+ The replacement of the concrete type (ex: java.util.LinkedList)
++ The concrete type's replacement (ex: java.util.LinkedList)
 
 It indicate the test results too:
 + The failed tests before the project's mutation
-+ Failed tests added by mutation
-+ Failed tests in common between project before and after the mutation.
-+ Failed tests resolved by the mutation
++ The failed tests added by the mutation
++ The failed tests in common between project before and after the mutation
++ The failed tests resolved by the mutation
 
 **3.2- listStatistic.txt**
 
-This report is the result of the source code analyse.
-It indicate:
-+ Where the interface choose for the mutation is used
+This report is the result of the source code's analyse.
+It indicates:
++ Where the interface chose for the mutation is used
 + Which concrete type instantiate it
 
 
@@ -110,44 +110,47 @@ It indicate:
 
 ### Version 1.0
 
-1. This version impose mutation strategy and selection strategy for the mutation point.
+1. This version don't allow the choose of the "mutation's strategy" and 
+the "selection's strategy" that selects the mutation's point.
 
-The selection strategy is "internal". Which means that the plugin will analyse the source code of your project
-and record the hierarchy of your classes.
-So, the mutation will be on your interfaces.
+The parameter of the "selection's strategy" is "internal". Which means 
+that the plugin will analyse your project's source code
+and record your classes' hierarchy.
+So, the mutation will be done only on your project's interfaces.
 
-The mutation strategy is "random". The plugin find all possible constructor calls for the mutation and take one randomly.
+The parameter of "mutation's strategy" is "random". The plugin will find
+ all of the possibles "constructor call" for the mutation and takes one randomly.
 
-2. The nchange is fix to 1
+2. The nchange is fixed to 1.
 
-For the moment, the number of mutation for test phase is limited to 1 change.
+So, for the moment, the number of mutations for the test's phase is limited to 1 change.
 
 ### Version 1.1
 
-1. Improve the interface selection algorithm
+1. Improve of the algorithm of interface's selection
 
-This version learn which interface or constructor call have not possibility of mutation.
-It record the project's hierarchy too.
-This information are recording in files target/diversiType_learning. 
+This version learns which interface or constructor call have no possibility of mutation.
+It records the project's hierarchy too.
+Those information are record in files store into the directory target/diversiType_learning. 
 
 If your project's source code change, you can delete this directory.
-But, in this case, all the learning is delete and the plugin restart to the beginning.
+But, in this case, all the learning it made will be deleted and the plugin will restart to the beginning.
 If you think that your project's hierarchy have no change, don't delete the directory.
 
 ### Version 1.2
 
-The version generate a HTML report into target/diversiType_report.
+The version generate a HTML report into the directory target/diversiType_report.
 This web page represent a graph of the project's hierarchy.
 
 ### Version 2
-This version allow to change the number of change and we can choose all mutation point when we give nchange=-1.
-The mode external is now possible but you should specify an interface.
+This version allow to change the number of change. You also can choose all mutation's point when you give "nchange=-1".
+The mode "external" for the "selection's strategy" is now possible but you have to specify an interface.
 
 ## In the future...
 
-+ Add different strategies (internal or external - random or chosen)
-+ Give the possibility to do more change ( >1)
-+ Improve the interface selection algorithm
++ Add different strategies ("internal" or "external" - "random" or "chosen")
++ Give the possibility to do more changes (>1)
++ Improve the algorithm of interface's selection
 + Choose precisely the interface to mutate
 + Become less dependant to maven project structure
 + Improve the result analyse (why the test fail with the mutation)
